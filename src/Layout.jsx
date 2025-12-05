@@ -32,7 +32,7 @@ export default function Layout({ children, currentPageName }) {
   if (currentPageName === 'Login') {
     return (
       <ThemeProvider>
-        <div className="min-h-screen bg-slate-950">
+        <div className="min-h-screen bg-background transition-colors duration-300">
           {children}
         </div>
       </ThemeProvider>
@@ -42,10 +42,10 @@ export default function Layout({ children, currentPageName }) {
   if (isLoading) {
     return (
       <ThemeProvider>
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="min-h-screen bg-background flex items-center justify-center transition-colors duration-300">
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
-            <p className="text-slate-400">Carregando...</p>
+            <p className="text-muted-foreground">Carregando...</p>
           </div>
         </div>
       </ThemeProvider>
@@ -100,7 +100,7 @@ export default function Layout({ children, currentPageName }) {
         }
       `}</style>
       
-      <div className="min-h-screen bg-slate-950 dark:bg-slate-950 light:bg-slate-50">
+      <div className="min-h-screen bg-background transition-colors duration-300">
         <Sidebar 
           collapsed={collapsed} 
           setCollapsed={setCollapsed} 
