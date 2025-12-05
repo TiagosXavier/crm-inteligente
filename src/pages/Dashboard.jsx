@@ -61,7 +61,7 @@ const responseTimeData = [
 function StatCard({ title, value, icon: Icon, trend, color, isLoading }) {
   if (isLoading) {
     return (
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border">
         <CardContent className="p-6">
           <Skeleton className="h-4 w-24 mb-2" />
           <Skeleton className="h-8 w-16" />
@@ -71,12 +71,12 @@ function StatCard({ title, value, icon: Icon, trend, color, isLoading }) {
   }
 
   return (
-    <Card className="bg-slate-900 border-slate-800 hover:border-slate-700 transition-all duration-300 group">
+    <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300 group">
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm text-slate-400 mb-1">{title}</p>
-            <p className="text-3xl font-bold text-white">{value}</p>
+            <p className="text-sm text-muted-foreground mb-1">{title}</p>
+            <p className="text-3xl font-bold text-foreground">{value}</p>
             {trend && (
               <div className="flex items-center gap-1 mt-2">
                 <TrendingUp className="w-4 h-4 text-emerald-500" />
@@ -145,8 +145,8 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-slate-400">Visão geral do seu CRM</p>
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground">Visão geral do seu CRM</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-slate-400">
           <Clock className="w-4 h-4" />
@@ -191,9 +191,9 @@ export default function Dashboard() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Conversations Chart */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-white text-lg">Conversas por Dia</CardTitle>
+            <CardTitle className="text-foreground text-lg">Conversas por Dia</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -229,9 +229,9 @@ export default function Dashboard() {
         </Card>
 
         {/* Category Distribution */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-white text-lg">Distribuição por Categoria</CardTitle>
+            <CardTitle className="text-foreground text-lg">Distribuição por Categoria</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-center">
@@ -265,7 +265,7 @@ export default function Dashboard() {
               {categoryData.map((item) => (
                 <div key={item.name} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-sm text-slate-400">{item.name}</span>
+                  <span className="text-sm text-muted-foreground">{item.name}</span>
                 </div>
               ))}
             </div>
@@ -276,9 +276,9 @@ export default function Dashboard() {
       {/* Bottom Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Contacts */}
-        <Card className="bg-slate-900 border-slate-800 lg:col-span-2">
+        <Card className="bg-card border-border lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-white text-lg">Últimos Contatos</CardTitle>
+            <CardTitle className="text-foreground text-lg">Últimos Contatos</CardTitle>
           </CardHeader>
           <CardContent>
             {contactsLoading ? (
@@ -294,7 +294,7 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : recentContacts.length === 0 ? (
-              <div className="text-center py-8 text-slate-400">
+              <div className="text-center py-8 text-muted-foreground">
                 <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>Nenhum contato cadastrado ainda</p>
               </div>
@@ -303,16 +303,16 @@ export default function Dashboard() {
                 {recentContacts.map((contact) => (
                   <div
                     key={contact.id}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors"
+                    className="flex items-center gap-3 p-3 rounded-lg bg-accent/50 hover:bg-accent transition-colors"
                   >
                     <Avatar className="w-10 h-10">
-                      <AvatarFallback className="bg-indigo-600 text-white text-sm">
+                      <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                         {getInitials(contact.name)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-medium truncate">{contact.name}</p>
-                      <div className="flex items-center gap-2 text-sm text-slate-400">
+                      <p className="text-foreground font-medium truncate">{contact.name}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Phone className="w-3 h-3" />
                         {contact.phone}
                       </div>
@@ -328,9 +328,9 @@ export default function Dashboard() {
         </Card>
 
         {/* Response Time */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-white text-lg">Tempo de Resposta (min)</CardTitle>
+            <CardTitle className="text-foreground text-lg">Tempo de Resposta (min)</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
