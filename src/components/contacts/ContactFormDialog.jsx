@@ -133,7 +133,7 @@ export default function ContactFormDialog({ open, onOpenChange, contact, onSave,
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-900 border-slate-800 text-white max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border text-foreground max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{contact ? 'Editar Contato' : 'Novo Contato'}</DialogTitle>
         </DialogHeader>
@@ -146,7 +146,7 @@ export default function ContactFormDialog({ open, onOpenChange, contact, onSave,
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder="Nome completo"
-              className={`bg-slate-800 border-slate-700 ${errors.name ? 'border-rose-500' : ''}`}
+              className={`bg-background border-border ${errors.name ? 'border-rose-500' : ''}`}
             />
             {errors.name && <p className="text-xs text-rose-500">{errors.name}</p>}
           </div>
@@ -196,7 +196,7 @@ export default function ContactFormDialog({ open, onOpenChange, contact, onSave,
                 value={formData.company}
                 onChange={(e) => handleChange('company', e.target.value)}
                 placeholder="Nome da empresa"
-                className="bg-slate-800 border-slate-700"
+                className="bg-background border-border"
               />
             </div>
           </div>
@@ -208,7 +208,7 @@ export default function ContactFormDialog({ open, onOpenChange, contact, onSave,
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Adicionar tag"
-                className="bg-slate-800 border-slate-700"
+                className="bg-background border-border"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -226,7 +226,7 @@ export default function ContactFormDialog({ open, onOpenChange, contact, onSave,
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30"
+                    className="bg-primary/20 text-primary hover:bg-primary/30"
                   >
                     {tag}
                     <button
@@ -265,7 +265,7 @@ export default function ContactFormDialog({ open, onOpenChange, contact, onSave,
             <Button
               type="submit"
               disabled={isSaving}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-primary hover:bg-primary/90"
             >
               {isSaving ? (
                 <>

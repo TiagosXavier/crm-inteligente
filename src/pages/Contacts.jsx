@@ -172,8 +172,8 @@ export default function Contacts() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Contatos</h1>
-          <p className="text-slate-400">Gerencie seus clientes e leads</p>
+          <h1 className="text-2xl font-bold text-foreground">Contatos</h1>
+          <p className="text-muted-foreground">Gerencie seus clientes e leads</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="gap-2">
@@ -185,7 +185,7 @@ export default function Contacts() {
               setSelectedContact(null);
               setIsFormOpen(true);
             }}
-            className="bg-indigo-600 hover:bg-indigo-700 gap-2"
+            className="bg-primary hover:bg-primary/90 gap-2"
           >
             <Plus className="w-4 h-4" />
             Novo Contato
@@ -194,24 +194,24 @@ export default function Contacts() {
       </div>
 
       {/* Filters */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border">
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar por nome, telefone, email ou empresa..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-slate-800 border-slate-700"
+                className="pl-10 bg-background border-border"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-48 bg-slate-800 border-slate-700">
+              <SelectTrigger className="w-full md:w-48 bg-background border-border">
                 <Filter className="w-4 h-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700">
+              <SelectContent className="bg-popover border-border">
                 {statusOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -230,8 +230,8 @@ export default function Contacts() {
           return (
             <Card
               key={status.value}
-              className={`bg-slate-900 border-slate-800 cursor-pointer transition-all hover:border-slate-600 ${
-                statusFilter === status.value ? 'border-indigo-500' : ''
+              className={`bg-card border-border cursor-pointer transition-all hover:border-primary/50 ${
+                statusFilter === status.value ? 'border-primary' : ''
               }`}
               onClick={() => setStatusFilter(statusFilter === status.value ? 'all' : status.value)}
             >
@@ -239,8 +239,8 @@ export default function Contacts() {
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${statusColors[status.value]}`} />
                   <div>
-                    <p className="text-2xl font-bold text-white">{count}</p>
-                    <p className="text-xs text-slate-400">{status.label}</p>
+                    <p className="text-2xl font-bold text-foreground">{count}</p>
+                    <p className="text-xs text-muted-foreground">{status.label}</p>
                   </div>
                 </div>
               </CardContent>
@@ -250,25 +250,25 @@ export default function Contacts() {
       </div>
 
       {/* Table */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-slate-800 hover:bg-transparent">
-                  <TableHead className="text-slate-400">Contato</TableHead>
-                  <TableHead className="text-slate-400">Telefone</TableHead>
-                  <TableHead className="text-slate-400 hidden md:table-cell">Email</TableHead>
-                  <TableHead className="text-slate-400 hidden lg:table-cell">Empresa</TableHead>
-                  <TableHead className="text-slate-400">Status</TableHead>
-                  <TableHead className="text-slate-400 hidden lg:table-cell">Tags</TableHead>
-                  <TableHead className="text-slate-400 text-right">Ações</TableHead>
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-muted-foreground">Contato</TableHead>
+                  <TableHead className="text-muted-foreground">Telefone</TableHead>
+                  <TableHead className="text-muted-foreground hidden md:table-cell">Email</TableHead>
+                  <TableHead className="text-muted-foreground hidden lg:table-cell">Empresa</TableHead>
+                  <TableHead className="text-muted-foreground">Status</TableHead>
+                  <TableHead className="text-muted-foreground hidden lg:table-cell">Tags</TableHead>
+                  <TableHead className="text-muted-foreground text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   [...Array(5)].map((_, i) => (
-                    <TableRow key={i} className="border-slate-800">
+                    <TableRow key={i} className="border-border">
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Skeleton className="w-10 h-10 rounded-full" />
@@ -286,13 +286,13 @@ export default function Contacts() {
                 ) : filteredContacts.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-12">
-                      <Users className="w-12 h-12 mx-auto mb-3 text-slate-600" />
-                      <p className="text-slate-400">Nenhum contato encontrado</p>
+                      <Users className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                      <p className="text-muted-foreground">Nenhum contato encontrado</p>
                       {search && (
                         <Button
                           variant="link"
                           onClick={() => setSearch('')}
-                          className="text-indigo-400 mt-2"
+                          className="text-primary mt-2"
                         >
                           Limpar busca
                         </Button>
@@ -303,19 +303,19 @@ export default function Contacts() {
                   filteredContacts.map((contact) => (
                     <TableRow
                       key={contact.id}
-                      className="border-slate-800 hover:bg-slate-800/50 cursor-pointer"
+                      className="border-border hover:bg-accent/50 cursor-pointer"
                       onClick={() => handleEdit(contact)}
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar className="w-10 h-10">
-                            <AvatarFallback className="bg-indigo-600 text-white text-sm">
+                            <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                               {getInitials(contact.name)}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium text-white">{contact.name}</p>
-                            <p className="text-xs text-slate-500">
+                            <p className="font-medium text-foreground">{contact.name}</p>
+                            <p className="text-xs text-muted-foreground">
                               {contact.created_date
                                 ? format(new Date(contact.created_date), "dd/MM/yyyy", { locale: ptBR })
                                 : ''}
@@ -324,29 +324,29 @@ export default function Contacts() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2 text-slate-300">
-                          <Phone className="w-4 h-4 text-slate-500" />
+                        <div className="flex items-center gap-2 text-foreground">
+                          <Phone className="w-4 h-4 text-muted-foreground" />
                           {contact.phone}
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {contact.email ? (
-                          <div className="flex items-center gap-2 text-slate-300">
-                            <Mail className="w-4 h-4 text-slate-500" />
+                          <div className="flex items-center gap-2 text-foreground">
+                            <Mail className="w-4 h-4 text-muted-foreground" />
                             {contact.email}
                           </div>
                         ) : (
-                          <span className="text-slate-600">-</span>
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
                         {contact.company ? (
-                          <div className="flex items-center gap-2 text-slate-300">
-                            <Building2 className="w-4 h-4 text-slate-500" />
+                          <div className="flex items-center gap-2 text-foreground">
+                            <Building2 className="w-4 h-4 text-muted-foreground" />
                             {contact.company}
                           </div>
                         ) : (
-                          <span className="text-slate-600">-</span>
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -360,13 +360,13 @@ export default function Contacts() {
                             <Badge
                               key={tag}
                               variant="secondary"
-                              className="bg-slate-700 text-slate-300 text-xs"
+                              className="bg-secondary text-secondary-foreground text-xs"
                             >
                               {tag}
                             </Badge>
                           ))}
                           {contact.tags?.length > 2 && (
-                            <Badge variant="secondary" className="bg-slate-700 text-slate-300 text-xs">
+                            <Badge variant="secondary" className="bg-secondary text-secondary-foreground text-xs">
                               +{contact.tags.length - 2}
                             </Badge>
                           )}
@@ -375,17 +375,17 @@ export default function Contacts() {
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+                            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700">
+                          <DropdownMenuContent align="end" className="bg-popover border-border">
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleEdit(contact);
                               }}
-                              className="text-slate-300 hover:text-white hover:bg-slate-700"
+                              className="text-foreground hover:bg-accent"
                             >
                               <Pencil className="w-4 h-4 mr-2" />
                               Editar
@@ -395,7 +395,7 @@ export default function Contacts() {
                                 e.stopPropagation();
                                 setDeleteContact(contact);
                               }}
-                              className="text-rose-400 hover:text-rose-300 hover:bg-slate-700"
+                              className="text-rose-400 hover:text-rose-300 hover:bg-accent"
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
                               Excluir
@@ -423,15 +423,15 @@ export default function Contacts() {
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteContact} onOpenChange={() => setDeleteContact(null)}>
-        <AlertDialogContent className="bg-slate-900 border-slate-800">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Excluir Contato</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogTitle className="text-foreground">Excluir Contato</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
               Tem certeza que deseja excluir <strong>{deleteContact?.name}</strong>? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+            <AlertDialogCancel className="bg-background border-border text-foreground hover:bg-accent">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
