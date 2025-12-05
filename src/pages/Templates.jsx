@@ -172,30 +172,30 @@ export default function Templates() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Templates</h1>
-          <p className="text-slate-400">Respostas rápidas para agilizar o atendimento</p>
+          <h1 className="text-2xl font-bold text-foreground">Templates</h1>
+          <p className="text-muted-foreground">Respostas rápidas para agilizar o atendimento</p>
         </div>
-        <Button onClick={() => openForm()} className="bg-indigo-600 hover:bg-indigo-700 gap-2">
+        <Button onClick={() => openForm()} className="bg-primary hover:bg-primary/90 gap-2">
           <Plus className="w-4 h-4" />
           Novo Template
         </Button>
       </div>
 
       {/* Filters */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border">
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar templates..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-slate-800 border-slate-700"
+                className="pl-10 bg-background border-border"
               />
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full md:w-48 bg-slate-800 border-slate-700">
+              <SelectTrigger className="w-full md:w-48 bg-background border-border">
                 <Tag className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
@@ -217,8 +217,8 @@ export default function Templates() {
           return (
             <Card
               key={cat.value}
-              className={`bg-slate-900 border-slate-800 cursor-pointer transition-all hover:border-slate-600 ${
-                categoryFilter === cat.value ? 'border-indigo-500' : ''
+              className={`bg-card border-border cursor-pointer transition-all hover:border-primary/50 ${
+                categoryFilter === cat.value ? 'border-primary' : ''
               }`}
               onClick={() => setCategoryFilter(categoryFilter === cat.value ? 'all' : cat.value)}
             >
@@ -226,8 +226,8 @@ export default function Templates() {
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${cat.color}`} />
                   <div>
-                    <p className="text-2xl font-bold text-white">{count}</p>
-                    <p className="text-xs text-slate-400">{cat.label}</p>
+                    <p className="text-2xl font-bold text-foreground">{count}</p>
+                    <p className="text-xs text-muted-foreground">{cat.label}</p>
                   </div>
                 </div>
               </CardContent>
@@ -240,7 +240,7 @@ export default function Templates() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="bg-slate-900 border-slate-800">
+            <Card key={i} className="bg-card border-border">
               <CardContent className="p-4">
                 <Skeleton className="h-5 w-32 mb-2" />
                 <Skeleton className="h-4 w-20 mb-4" />
@@ -250,11 +250,11 @@ export default function Templates() {
           ))}
         </div>
       ) : filteredTemplates.length === 0 ? (
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-card border-border">
           <CardContent className="p-12 text-center">
-            <FileText className="w-12 h-12 mx-auto mb-3 text-slate-600" />
-            <p className="text-slate-400">Nenhum template encontrado</p>
-            <Button onClick={() => openForm()} variant="link" className="text-indigo-400 mt-2">
+            <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+            <p className="text-muted-foreground">Nenhum template encontrado</p>
+            <Button onClick={() => openForm()} variant="link" className="text-primary mt-2">
               Criar primeiro template
             </Button>
           </CardContent>
@@ -266,12 +266,12 @@ export default function Templates() {
             return (
               <Card
                 key={template.id}
-                className="bg-slate-900 border-slate-800 hover:border-slate-700 transition-all group"
+                className="bg-card border-border hover:border-primary/50 transition-all group"
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-white text-lg">{template.name}</CardTitle>
+                      <CardTitle className="text-foreground text-lg">{template.name}</CardTitle>
                       <Badge className={`${categoryInfo.color} text-white border-0 mt-2`}>
                         {categoryInfo.label}
                       </Badge>
@@ -281,7 +281,7 @@ export default function Templates() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleCopy(template)}
-                        className="text-slate-400 hover:text-white h-8 w-8"
+                        className="text-muted-foreground hover:text-foreground h-8 w-8"
                       >
                         {copiedId === template.id ? (
                           <Check className="w-4 h-4 text-emerald-500" />
@@ -293,7 +293,7 @@ export default function Templates() {
                         variant="ghost"
                         size="icon"
                         onClick={() => openForm(template)}
-                        className="text-slate-400 hover:text-white h-8 w-8"
+                        className="text-muted-foreground hover:text-foreground h-8 w-8"
                       >
                         <Pencil className="w-4 h-4" />
                       </Button>
@@ -301,7 +301,7 @@ export default function Templates() {
                         variant="ghost"
                         size="icon"
                         onClick={() => setDeleteTemplate(template)}
-                        className="text-slate-400 hover:text-rose-400 h-8 w-8"
+                        className="text-muted-foreground hover:text-rose-400 h-8 w-8"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -309,13 +309,13 @@ export default function Templates() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-slate-300 text-sm line-clamp-4 whitespace-pre-wrap">
+                  <p className="text-foreground text-sm line-clamp-4 whitespace-pre-wrap">
                     {template.content}
                   </p>
                   {template.shortcut && (
-                    <div className="flex items-center gap-2 mt-3 text-xs text-slate-500">
+                    <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
                       <Keyboard className="w-3 h-3" />
-                      <code className="bg-slate-800 px-2 py-1 rounded">/{template.shortcut}</code>
+                      <code className="bg-accent px-2 py-1 rounded">/{template.shortcut}</code>
                     </div>
                   )}
                 </CardContent>
@@ -327,7 +327,7 @@ export default function Templates() {
 
       {/* Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="bg-slate-900 border-slate-800 text-white max-w-md">
+        <DialogContent className="bg-card border-border text-foreground max-w-md">
           <DialogHeader>
             <DialogTitle>{selectedTemplate ? 'Editar Template' : 'Novo Template'}</DialogTitle>
           </DialogHeader>
@@ -338,7 +338,7 @@ export default function Templates() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Ex: Saudação inicial"
-                className="bg-slate-800 border-slate-700"
+                className="bg-background border-border"
               />
             </div>
             <div className="space-y-2">
@@ -350,7 +350,7 @@ export default function Templates() {
                 <SelectTrigger className="bg-slate-800 border-slate-700">
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700">
+                <SelectContent className="bg-popover border-border">
                   {categories.map((cat) => (
                     <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
                   ))}
@@ -363,9 +363,9 @@ export default function Templates() {
                 value={formData.shortcut}
                 onChange={(e) => setFormData({ ...formData, shortcut: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') })}
                 placeholder="Ex: ola"
-                className="bg-slate-800 border-slate-700"
+                className="bg-background border-border"
               />
-              <p className="text-xs text-slate-500">Digite /{formData.shortcut || 'atalho'} para usar rapidamente</p>
+              <p className="text-xs text-muted-foreground">Digite /{formData.shortcut || 'atalho'} para usar rapidamente</p>
             </div>
             <div className="space-y-2">
               <Label>Conteúdo *</Label>
@@ -382,7 +382,7 @@ export default function Templates() {
             <Button
               onClick={handleSave}
               disabled={createMutation.isPending || updateMutation.isPending}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-primary hover:bg-primary/90"
             >
               {(createMutation.isPending || updateMutation.isPending) ? (
                 <>
@@ -397,15 +397,15 @@ export default function Templates() {
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteTemplate} onOpenChange={() => setDeleteTemplate(null)}>
-        <AlertDialogContent className="bg-slate-900 border-slate-800">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Excluir Template</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogTitle className="text-foreground">Excluir Template</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
               Tem certeza que deseja excluir o template <strong>{deleteTemplate?.name}</strong>?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+            <AlertDialogCancel className="bg-background border-border text-foreground hover:bg-accent">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
