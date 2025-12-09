@@ -82,9 +82,9 @@ export default function Conversations() {
   };
 
   return (
-    <div className="h-[calc(100vh-7rem)] flex gap-4">
+    <div className="h-[calc(100vh-10rem)] flex gap-4">
       {/* Contacts List */}
-      <Card className="bg-card border-border w-80 flex-shrink-0 flex flex-col">
+      <Card className="bg-card border-border w-80 flex-shrink-0 flex flex-col overflow-hidden">
         <div className="p-4 border-b border-border">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
