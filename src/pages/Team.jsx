@@ -177,11 +177,11 @@ export default function Team() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Equipe</h1>
-          <p className="text-slate-400">Gerencie os agentes do seu time</p>
+          <h1 className="text-2xl font-bold text-foreground">Equipe</h1>
+          <p className="text-muted-foreground">Gerencie os agentes do seu time</p>
         </div>
         {isAdmin && (
-          <Button className="bg-indigo-600 hover:bg-indigo-700 gap-2" disabled>
+          <Button className="bg-primary hover:bg-primary/90 gap-2" disabled>
             <Plus className="w-4 h-4" />
             Convidar Usuário
           </Button>
@@ -190,54 +190,54 @@ export default function Team() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-indigo-500/20">
-                <Users className="w-5 h-5 text-indigo-400" />
+              <div className="p-2 rounded-lg bg-primary/20">
+                <Users className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{stats.total}</p>
-                <p className="text-xs text-slate-400">Total</p>
+                <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-xs text-muted-foreground">Total</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-emerald-500/20">
                 <Circle className="w-5 h-5 text-emerald-400 fill-emerald-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{stats.online}</p>
-                <p className="text-xs text-slate-400">Online</p>
+                <p className="text-2xl font-bold text-foreground">{stats.online}</p>
+                <p className="text-xs text-muted-foreground">Online</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-rose-500/20">
                 <Shield className="w-5 h-5 text-rose-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{stats.admins}</p>
-                <p className="text-xs text-slate-400">Admins</p>
+                <p className="text-2xl font-bold text-foreground">{stats.admins}</p>
+                <p className="text-xs text-muted-foreground">Admins</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-amber-500/20">
                 <UserCog className="w-5 h-5 text-amber-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{stats.supervisors}</p>
-                <p className="text-xs text-slate-400">Supervisores</p>
+                <p className="text-2xl font-bold text-foreground">{stats.supervisors}</p>
+                <p className="text-xs text-muted-foreground">Supervisores</p>
               </div>
             </div>
           </CardContent>
@@ -245,20 +245,20 @@ export default function Team() {
       </div>
 
       {/* Filters */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border">
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar por nome ou email..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-slate-800 border-slate-700"
+                className="pl-10 bg-background border-border"
               />
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-full md:w-48 bg-slate-800 border-slate-700">
+              <SelectTrigger className="w-full md:w-48 bg-background border-border">
                 <Shield className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Cargo" />
               </SelectTrigger>
@@ -277,7 +277,7 @@ export default function Team() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="bg-slate-900 border-slate-800">
+            <Card key={i} className="bg-card border-border">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
                   <Skeleton className="w-14 h-14 rounded-full" />
@@ -291,10 +291,10 @@ export default function Team() {
           ))}
         </div>
       ) : filteredUsers.length === 0 ? (
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-card border-border">
           <CardContent className="p-12 text-center">
-            <Users className="w-12 h-12 mx-auto mb-3 text-slate-600" />
-            <p className="text-slate-400">Nenhum usuário encontrado</p>
+            <Users className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+            <p className="text-muted-foreground">Nenhum usuário encontrado</p>
           </CardContent>
         </Card>
       ) : (
@@ -302,7 +302,7 @@ export default function Team() {
           {filteredUsers.map((user) => (
             <Card
               key={user.id}
-              className={`bg-slate-900 border-slate-800 hover:border-slate-700 transition-all ${
+              className={`bg-card border-border hover:border-primary/50 transition-all ${
                 user.is_active === false ? 'opacity-60' : ''
               }`}
             >
@@ -310,17 +310,17 @@ export default function Team() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
                     <div className="relative">
-                      <Avatar className="w-14 h-14 border-2 border-slate-700">
+                      <Avatar className="w-14 h-14 border-2 border-border">
                         <AvatarImage src={user.avatar_url} />
-                        <AvatarFallback className="bg-indigo-600 text-white text-lg">
+                        <AvatarFallback className="bg-primary text-primary-foreground text-lg">
                           {getInitials(user.full_name)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-slate-900 ${statusColors[user.status || 'offline']}`} />
+                      <span className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-card ${statusColors[user.status || 'offline']}`} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white">{user.full_name}</h3>
-                      <p className="text-sm text-slate-400">{user.email}</p>
+                      <h3 className="font-semibold text-foreground">{user.full_name}</h3>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
                   {isAdmin && (
@@ -328,7 +328,7 @@ export default function Team() {
                       variant="ghost"
                       size="icon"
                       onClick={() => openForm(user)}
-                      className="text-slate-400 hover:text-white"
+                      className="text-muted-foreground hover:text-foreground"
                     >
                       <Pencil className="w-4 h-4" />
                     </Button>
@@ -341,20 +341,20 @@ export default function Team() {
                       {roleLabels[user.role]}
                     </Badge>
                     {user.is_active === false && (
-                      <Badge variant="secondary" className="bg-slate-700">Inativo</Badge>
+                      <Badge variant="secondary" className="bg-secondary">Inativo</Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-slate-400">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Circle className={`w-2 h-2 ${statusColors[user.status || 'offline']} rounded-full`} />
                     {statusLabels[user.status || 'offline']}
                   </div>
                 </div>
 
                 {user.max_simultaneous && (
-                  <div className="mt-4 pt-4 border-t border-slate-800">
+                  <div className="mt-4 pt-4 border-t border-border">
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Atendimentos simultâneos:</span>
-                      <span className="text-white font-medium">{user.max_simultaneous}</span>
+                      <span className="text-muted-foreground">Atendimentos simultâneos:</span>
+                      <span className="text-foreground font-medium">{user.max_simultaneous}</span>
                     </div>
                   </div>
                 )}
@@ -366,20 +366,20 @@ export default function Team() {
 
       {/* Edit Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="bg-slate-900 border-slate-800 text-white max-w-md">
+        <DialogContent className="bg-card border-border text-foreground max-w-md">
           <DialogHeader>
             <DialogTitle>Editar Usuário</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 bg-slate-800 rounded-lg">
+            <div className="flex items-center gap-4 p-4 bg-accent rounded-lg">
               <Avatar className="w-12 h-12">
-                <AvatarFallback className="bg-indigo-600 text-white">
+                <AvatarFallback className="bg-primary text-primary-foreground">
                   {getInitials(formData.full_name)}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-medium">{formData.full_name}</p>
-                <p className="text-sm text-slate-400">{formData.email}</p>
+                <p className="text-sm text-muted-foreground">{formData.email}</p>
               </div>
             </div>
 
@@ -389,10 +389,10 @@ export default function Team() {
                 value={formData.status}
                 onValueChange={(v) => setFormData({ ...formData, status: v })}
               >
-                <SelectTrigger className="bg-slate-800 border-slate-700">
+                <SelectTrigger className="bg-background border-border">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700">
+                <SelectContent className="bg-popover border-border">
                   {Object.entries(statusLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>{label}</SelectItem>
                   ))}
@@ -408,14 +408,14 @@ export default function Team() {
                 max={20}
                 value={formData.max_simultaneous}
                 onChange={(e) => setFormData({ ...formData, max_simultaneous: parseInt(e.target.value) || 5 })}
-                className="bg-slate-800 border-slate-700"
+                className="bg-background border-border"
               />
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-slate-800 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-accent rounded-lg">
               <div>
                 <Label>Usuário Ativo</Label>
-                <p className="text-sm text-slate-400">Pode acessar o sistema</p>
+                <p className="text-sm text-muted-foreground">Pode acessar o sistema</p>
               </div>
               <Switch
                 checked={formData.is_active}
@@ -428,7 +428,7 @@ export default function Team() {
             <Button
               onClick={handleSave}
               disabled={updateMutation.isPending}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-primary hover:bg-primary/90"
             >
               {updateMutation.isPending ? (
                 <>

@@ -84,15 +84,15 @@ export default function Conversations() {
   return (
     <div className="h-[calc(100vh-7rem)] flex gap-4">
       {/* Contacts List */}
-      <Card className="bg-slate-900 border-slate-800 w-80 flex-shrink-0 flex flex-col">
-        <div className="p-4 border-b border-slate-800">
+      <Card className="bg-card border-border w-80 flex-shrink-0 flex flex-col">
+        <div className="p-4 border-b border-border">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Buscar conversas..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-slate-800 border-slate-700"
+              className="pl-10 bg-background border-border"
             />
           </div>
         </div>
@@ -112,8 +112,8 @@ export default function Conversations() {
             </div>
           ) : filteredContacts.length === 0 ? (
             <div className="p-8 text-center">
-              <MessageSquare className="w-10 h-10 mx-auto mb-2 text-slate-600" />
-              <p className="text-slate-400 text-sm">Nenhuma conversa encontrada</p>
+              <MessageSquare className="w-10 h-10 mx-auto mb-2 text-muted-foreground opacity-50" />
+              <p className="text-muted-foreground text-sm">Nenhuma conversa encontrada</p>
             </div>
           ) : (
             <div className="p-2">
@@ -123,27 +123,27 @@ export default function Conversations() {
                   onClick={() => setSelectedContact(contact)}
                   className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
                     selectedContact?.id === contact.id
-                      ? 'bg-indigo-600/20 border border-indigo-500/30'
-                      : 'hover:bg-slate-800'
+                      ? 'bg-primary/20 border border-primary/30'
+                      : 'hover:bg-accent'
                   }`}
                 >
                   <div className="relative">
                     <Avatar className="w-12 h-12">
-                      <AvatarFallback className="bg-indigo-600 text-white">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
                         {getInitials(contact.name)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-900 ${getStatusColor(contact.status)}`} />
+                    <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-card ${getStatusColor(contact.status)}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-white truncate">{contact.name}</h3>
-                      <span className="text-xs text-slate-500">{formatDate(contact.created_date)}</span>
+                      <h3 className="font-medium text-foreground truncate">{contact.name}</h3>
+                      <span className="text-xs text-muted-foreground">{formatDate(contact.created_date)}</span>
                     </div>
-                    <p className="text-sm text-slate-400 truncate">Última mensagem do contato...</p>
+                    <p className="text-sm text-muted-foreground truncate">Última mensagem do contato...</p>
                   </div>
                   {Math.random() > 0.5 && (
-                    <span className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center text-xs text-white font-bold">
+                    <span className="w-5 h-5 bg-primary rounded-full flex items-center justify-center text-xs text-primary-foreground font-bold">
                       {Math.floor(Math.random() * 5) + 1}
                     </span>
                   )}
@@ -156,24 +156,24 @@ export default function Conversations() {
 
       {/* Chat Area */}
       {selectedContact ? (
-        <Card className="bg-slate-900 border-slate-800 flex-1 flex flex-col">
+        <Card className="bg-card border-border flex-1 flex flex-col">
           {/* Chat Header */}
-          <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+          <div className="p-4 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
-                <AvatarFallback className="bg-indigo-600 text-white">
+                <AvatarFallback className="bg-primary text-primary-foreground">
                   {getInitials(selectedContact.name)}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="font-semibold text-white">{selectedContact.name}</h2>
-                <div className="flex items-center gap-2 text-sm text-slate-400">
+                <h2 className="font-semibold text-foreground">{selectedContact.name}</h2>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Circle className={`w-2 h-2 ${getStatusColor(selectedContact.status)}`} />
                   <span>Online</span>
                 </div>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
               <MoreVertical className="w-5 h-5" />
             </Button>
           </div>
@@ -182,7 +182,7 @@ export default function Conversations() {
           <ScrollArea className="flex-1 p-4">
             <div className="space-y-4">
               <div className="text-center">
-                <span className="text-xs text-slate-500 bg-slate-800 px-3 py-1 rounded-full">
+                <span className="text-xs text-muted-foreground bg-accent px-3 py-1 rounded-full">
                   Hoje
                 </span>
               </div>
@@ -195,12 +195,12 @@ export default function Conversations() {
                   <div
                     className={`max-w-[70%] p-3 rounded-2xl ${
                       msg.fromUser
-                        ? 'bg-slate-800 text-white rounded-bl-none'
-                        : 'bg-indigo-600 text-white rounded-br-none'
+                        ? 'bg-accent text-foreground rounded-bl-none'
+                        : 'bg-primary text-primary-foreground rounded-br-none'
                     }`}
                   >
                     <p className="text-sm">{msg.content}</p>
-                    <div className={`flex items-center justify-end gap-1 mt-1 ${msg.fromUser ? 'text-slate-500' : 'text-indigo-200'}`}>
+                    <div className={`flex items-center justify-end gap-1 mt-1 ${msg.fromUser ? 'text-muted-foreground' : 'text-primary-foreground/70'}`}>
                       <span className="text-xs">{msg.time}</span>
                       {!msg.fromUser && <CheckCheck className="w-3 h-3" />}
                     </div>
@@ -211,81 +211,81 @@ export default function Conversations() {
           </ScrollArea>
 
           {/* Input Area */}
-          <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-800">
+          <form onSubmit={handleSendMessage} className="p-4 border-t border-border">
             <div className="flex items-center gap-2">
-              <Button type="button" variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+              <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
                 <Paperclip className="w-5 h-5" />
               </Button>
               <Input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Digite sua mensagem..."
-                className="flex-1 bg-slate-800 border-slate-700"
+                className="flex-1 bg-background border-border"
               />
-              <Button type="button" variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+              <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
                 <Smile className="w-5 h-5" />
               </Button>
-              <Button type="submit" size="icon" className="bg-indigo-600 hover:bg-indigo-700">
+              <Button type="submit" size="icon" className="bg-primary hover:bg-primary/90">
                 <Send className="w-4 h-4" />
               </Button>
             </div>
           </form>
         </Card>
       ) : (
-        <Card className="bg-slate-900 border-slate-800 flex-1 flex items-center justify-center">
+        <Card className="bg-card border-border flex-1 flex items-center justify-center">
           <div className="text-center">
-            <MessageSquare className="w-16 h-16 mx-auto mb-4 text-slate-700" />
-            <h2 className="text-xl font-semibold text-white mb-2">Selecione uma conversa</h2>
-            <p className="text-slate-400">Escolha um contato para iniciar o atendimento</p>
+            <MessageSquare className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+            <h2 className="text-xl font-semibold text-foreground mb-2">Selecione uma conversa</h2>
+            <p className="text-muted-foreground">Escolha um contato para iniciar o atendimento</p>
           </div>
         </Card>
       )}
 
       {/* Contact Details Sidebar */}
       {selectedContact && (
-        <Card className="bg-slate-900 border-slate-800 w-72 flex-shrink-0 hidden lg:block">
+        <Card className="bg-card border-border w-72 flex-shrink-0 hidden lg:block">
           <CardContent className="p-6">
             <div className="text-center mb-6">
               <Avatar className="w-20 h-20 mx-auto mb-3">
-                <AvatarFallback className="bg-indigo-600 text-white text-2xl">
+                <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
                   {getInitials(selectedContact.name)}
                 </AvatarFallback>
               </Avatar>
-              <h3 className="font-semibold text-white text-lg">{selectedContact.name}</h3>
+              <h3 className="font-semibold text-foreground text-lg">{selectedContact.name}</h3>
               <Badge className={`${getStatusColor(selectedContact.status)} text-white border-0 mt-2`}>
                 {selectedContact.status?.replace('_', ' ')}
               </Badge>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
-                <Phone className="w-4 h-4 text-slate-400" />
-                <span className="text-sm text-slate-300">{selectedContact.phone}</span>
+              <div className="flex items-center gap-3 p-3 bg-accent rounded-lg">
+                <Phone className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-foreground">{selectedContact.phone}</span>
               </div>
               
               {selectedContact.email && (
-                <div className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
-                  <Mail className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm text-slate-300 truncate">{selectedContact.email}</span>
+                <div className="flex items-center gap-3 p-3 bg-accent rounded-lg">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground truncate">{selectedContact.email}</span>
                 </div>
               )}
               
               {selectedContact.company && (
-                <div className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
-                  <Building2 className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm text-slate-300">{selectedContact.company}</span>
+                <div className="flex items-center gap-3 p-3 bg-accent rounded-lg">
+                  <Building2 className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">{selectedContact.company}</span>
                 </div>
               )}
 
               {selectedContact.tags?.length > 0 && (
-                <div className="p-3 bg-slate-800 rounded-lg">
+                <div className="p-3 bg-accent rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <Tag className="w-4 h-4 text-slate-400" />
-                    <span className="text-sm text-slate-400">Tags</span>
+                    <Tag className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Tags</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {selectedContact.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="bg-slate-700 text-slate-300 text-xs">
+                      <Badge key={tag} variant="secondary" className="bg-secondary text-secondary-foreground text-xs">
                         {tag}
                       </Badge>
                     ))}
@@ -294,9 +294,9 @@ export default function Conversations() {
               )}
 
               {selectedContact.notes && (
-                <div className="p-3 bg-slate-800 rounded-lg">
-                  <p className="text-sm text-slate-400 mb-1">Observações</p>
-                  <p className="text-sm text-slate-300">{selectedContact.notes}</p>
+                <div className="p-3 bg-accent rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-1">Observações</p>
+                  <p className="text-sm text-foreground">{selectedContact.notes}</p>
                 </div>
               )}
             </div>

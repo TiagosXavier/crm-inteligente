@@ -195,12 +195,12 @@ export default function Settings() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Configurações</h1>
-        <p className="text-slate-400">Gerencie seu perfil e configurações do sistema</p>
+        <h1 className="text-2xl font-bold text-foreground">Configurações</h1>
+        <p className="text-muted-foreground">Gerencie seu perfil e configurações do sistema</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-slate-800 border-slate-700">
+        <TabsList className="bg-accent border-border">
           <TabsTrigger value="profile" className="gap-2">
             <User className="w-4 h-4" />
             Perfil
@@ -221,9 +221,9 @@ export default function Settings() {
         <TabsContent value="profile" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Profile Card */}
-            <Card className="bg-slate-900 border-slate-800 lg:col-span-2">
+            <Card className="bg-card border-border lg:col-span-2">
               <CardHeader>
-                <CardTitle className="text-white">Informações do Perfil</CardTitle>
+                <CardTitle className="text-foreground">Informações do Perfil</CardTitle>
                 <CardDescription>Atualize suas informações pessoais</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -236,9 +236,9 @@ export default function Settings() {
                 ) : (
                   <>
                     <div className="flex items-center gap-4">
-                      <Avatar className="w-20 h-20 border-2 border-indigo-500">
+                      <Avatar className="w-20 h-20 border-2 border-primary">
                         <AvatarImage src={currentUser?.avatar_url} />
-                        <AvatarFallback className="bg-indigo-600 text-white text-2xl">
+                        <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
                           {getInitials(currentUser?.full_name)}
                         </AvatarFallback>
                       </Avatar>
@@ -246,7 +246,7 @@ export default function Settings() {
                         <Button variant="outline" size="sm" disabled>
                           Alterar foto
                         </Button>
-                        <p className="text-xs text-slate-500 mt-1">JPG ou PNG. Máx 2MB.</p>
+                        <p className="text-xs text-muted-foreground mt-1">JPG ou PNG. Máx 2MB.</p>
                       </div>
                     </div>
 
@@ -256,16 +256,16 @@ export default function Settings() {
                         <Input
                           value={currentUser?.full_name || ''}
                           disabled
-                          className="bg-slate-800 border-slate-700"
+                          className="bg-background border-border"
                         />
-                        <p className="text-xs text-slate-500">Nome não pode ser alterado</p>
+                        <p className="text-xs text-muted-foreground">Nome não pode ser alterado</p>
                       </div>
                       <div className="space-y-2">
                         <Label>Email</Label>
                         <Input
                           value={currentUser?.email || ''}
                           disabled
-                          className="bg-slate-800 border-slate-700"
+                          className="bg-background border-border"
                         />
                       </div>
                     </div>
@@ -273,10 +273,10 @@ export default function Settings() {
                     <div className="space-y-2">
                       <Label>Cargo</Label>
                       <div className="flex items-center gap-2">
-                        <Badge className="bg-indigo-600 text-white">
+                        <Badge className="bg-primary text-primary-foreground">
                           {getRoleLabel(currentUser?.role)}
                         </Badge>
-                        <span className="text-xs text-slate-500">Gerenciado pelo administrador</span>
+                        <span className="text-xs text-muted-foreground">Gerenciado pelo administrador</span>
                       </div>
                     </div>
                   </>
@@ -285,35 +285,35 @@ export default function Settings() {
             </Card>
 
             {/* Stats Card */}
-            <Card className="bg-slate-900 border-slate-800">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-white">Estatísticas</CardTitle>
+                <CardTitle className="text-foreground">Estatísticas</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 bg-slate-800 rounded-lg">
+                <div className="p-4 bg-accent rounded-lg">
                   <div className="flex items-center gap-3">
-                    <MessageSquare className="w-5 h-5 text-indigo-400" />
+                    <MessageSquare className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-2xl font-bold text-white">127</p>
-                      <p className="text-xs text-slate-400">Conversas este mês</p>
+                      <p className="text-2xl font-bold text-foreground">127</p>
+                      <p className="text-xs text-muted-foreground">Conversas este mês</p>
                     </div>
                   </div>
                 </div>
-                <div className="p-4 bg-slate-800 rounded-lg">
+                <div className="p-4 bg-accent rounded-lg">
                   <div className="flex items-center gap-3">
                     <Zap className="w-5 h-5 text-amber-400" />
                     <div>
-                      <p className="text-2xl font-bold text-white">2.5 min</p>
-                      <p className="text-xs text-slate-400">Tempo médio de resposta</p>
+                      <p className="text-2xl font-bold text-foreground">2.5 min</p>
+                      <p className="text-xs text-muted-foreground">Tempo médio de resposta</p>
                     </div>
                   </div>
                 </div>
-                <div className="p-4 bg-slate-800 rounded-lg">
+                <div className="p-4 bg-accent rounded-lg">
                   <div className="flex items-center gap-3">
                     <Sparkles className="w-5 h-5 text-emerald-400" />
                     <div>
-                      <p className="text-2xl font-bold text-white">98%</p>
-                      <p className="text-xs text-slate-400">Taxa de resolução</p>
+                      <p className="text-2xl font-bold text-foreground">98%</p>
+                      <p className="text-xs text-muted-foreground">Taxa de resolução</p>
                     </div>
                   </div>
                 </div>
@@ -325,14 +325,14 @@ export default function Settings() {
         {/* AI Tab */}
         {isAdmin && (
           <TabsContent value="ai" className="mt-6">
-            <Card className="bg-slate-900 border-slate-800">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-white">Configurações de IA</CardTitle>
+                    <CardTitle className="text-foreground">Configurações de IA</CardTitle>
                     <CardDescription>Configure os modelos de inteligência artificial</CardDescription>
                   </div>
-                  <Button onClick={() => openAIForm()} className="bg-indigo-600 hover:bg-indigo-700 gap-2">
+                  <Button onClick={() => openAIForm()} className="bg-primary hover:bg-primary/90 gap-2">
                     <Plus className="w-4 h-4" />
                     Nova Configuração
                   </Button>
@@ -347,9 +347,9 @@ export default function Settings() {
                   </div>
                 ) : aiConfigs.length === 0 ? (
                   <div className="text-center py-12">
-                    <Bot className="w-12 h-12 mx-auto mb-3 text-slate-600" />
-                    <p className="text-slate-400">Nenhuma configuração de IA criada</p>
-                    <Button onClick={() => openAIForm()} variant="link" className="text-indigo-400 mt-2">
+                    <Bot className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                    <p className="text-muted-foreground">Nenhuma configuração de IA criada</p>
+                    <Button onClick={() => openAIForm()} variant="link" className="text-primary mt-2">
                       Criar primeira configuração
                     </Button>
                   </div>
@@ -360,28 +360,28 @@ export default function Settings() {
                       return (
                         <div
                           key={config.id}
-                          className="flex items-center justify-between p-4 bg-slate-800 rounded-lg"
+                          className="flex items-center justify-between p-4 bg-accent rounded-lg"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center text-2xl">
+                            <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center text-2xl">
                               {provider?.icon || '🤖'}
                             </div>
                             <div>
-                              <h3 className="font-medium text-white">{config.name}</h3>
-                              <p className="text-sm text-slate-400">
+                              <h3 className="font-medium text-foreground">{config.name}</h3>
+                              <p className="text-sm text-muted-foreground">
                                 {provider?.label} • {config.model}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Badge className={config.is_active !== false ? 'bg-emerald-500' : 'bg-slate-600'}>
+                            <Badge className={config.is_active !== false ? 'bg-emerald-500' : 'bg-secondary'}>
                               {config.is_active !== false ? 'Ativo' : 'Inativo'}
                             </Badge>
                             <Button
                               variant="ghost"
                               size="icon"
                               onClick={() => openAIForm(config)}
-                              className="text-slate-400 hover:text-white"
+                              className="text-muted-foreground hover:text-foreground"
                             >
                               <Pencil className="w-4 h-4" />
                             </Button>
@@ -389,7 +389,7 @@ export default function Settings() {
                               variant="ghost"
                               size="icon"
                               onClick={() => setDeleteAIConfig(config)}
-                              className="text-slate-400 hover:text-rose-400"
+                              className="text-muted-foreground hover:text-rose-400"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -406,9 +406,9 @@ export default function Settings() {
 
         {/* Integrations Tab */}
         <TabsContent value="integrations" className="mt-6">
-          <Card className="bg-slate-900 border-slate-800">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white">Integrações</CardTitle>
+              <CardTitle className="text-foreground">Integrações</CardTitle>
               <CardDescription>Conecte com outras plataformas de comunicação</CardDescription>
             </CardHeader>
             <CardContent>
@@ -416,18 +416,18 @@ export default function Settings() {
                 {integrations.map((integration) => (
                   <div
                     key={integration.id}
-                    className="flex items-center justify-between p-4 bg-slate-800 rounded-lg border border-slate-700"
+                    className="flex items-center justify-between p-4 bg-accent rounded-lg border border-border"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center text-2xl">
+                      <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center text-2xl">
                         {integration.icon}
                       </div>
                       <div>
-                        <h3 className="font-medium text-white">{integration.name}</h3>
-                        <p className="text-sm text-slate-400">{integration.description}</p>
+                        <h3 className="font-medium text-foreground">{integration.name}</h3>
+                        <p className="text-sm text-muted-foreground">{integration.description}</p>
                       </div>
                     </div>
-                    <Badge className="bg-slate-600 text-slate-300">
+                    <Badge className="bg-secondary text-secondary-foreground">
                       <Lock className="w-3 h-3 mr-1" />
                       Em breve
                     </Badge>
@@ -441,7 +441,7 @@ export default function Settings() {
 
       {/* AI Config Form Dialog */}
       <Dialog open={isAIFormOpen} onOpenChange={setIsAIFormOpen}>
-        <DialogContent className="bg-slate-900 border-slate-800 text-white max-w-lg">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg">
           <DialogHeader>
             <DialogTitle>{selectedAIConfig ? 'Editar Configuração' : 'Nova Configuração de IA'}</DialogTitle>
           </DialogHeader>
@@ -452,7 +452,7 @@ export default function Settings() {
                 value={aiFormData.name}
                 onChange={(e) => setAIFormData({ ...aiFormData, name: e.target.value })}
                 placeholder="Ex: Assistente de Vendas"
-                className="bg-slate-800 border-slate-700"
+                className="bg-background border-border"
               />
             </div>
 
@@ -466,7 +466,7 @@ export default function Settings() {
                   <SelectTrigger className="bg-slate-800 border-slate-700">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectContent className="bg-popover border-border">
                     {providers.map((p) => (
                       <SelectItem key={p.value} value={p.value}>
                         {p.icon} {p.label}
@@ -484,7 +484,7 @@ export default function Settings() {
                   <SelectTrigger className="bg-slate-800 border-slate-700">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectContent className="bg-popover border-border">
                     {models[aiFormData.provider]?.map((m) => (
                       <SelectItem key={m} value={m}>{m}</SelectItem>
                     ))}
@@ -506,7 +506,7 @@ export default function Settings() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label>Temperatura</Label>
-                <span className="text-sm text-slate-400">{aiFormData.temperature}</span>
+                <span className="text-sm text-muted-foreground">{aiFormData.temperature}</span>
               </div>
               <Slider
                 value={[aiFormData.temperature]}
@@ -516,7 +516,7 @@ export default function Settings() {
                 step={0.1}
                 className="py-2"
               />
-              <p className="text-xs text-slate-500">Menor = mais preciso, Maior = mais criativo</p>
+              <p className="text-xs text-muted-foreground">Menor = mais preciso, Maior = mais criativo</p>
             </div>
 
             <div className="space-y-2">
@@ -525,7 +525,7 @@ export default function Settings() {
                 type="number"
                 value={aiFormData.max_tokens}
                 onChange={(e) => setAIFormData({ ...aiFormData, max_tokens: parseInt(e.target.value) || 1000 })}
-                className="bg-slate-800 border-slate-700"
+                className="bg-background border-border"
               />
             </div>
           </div>
@@ -534,7 +534,7 @@ export default function Settings() {
             <Button
               onClick={handleSaveAI}
               disabled={createAIMutation.isPending || updateAIMutation.isPending}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-primary hover:bg-primary/90"
             >
               {(createAIMutation.isPending || updateAIMutation.isPending) ? (
                 <>
@@ -549,15 +549,15 @@ export default function Settings() {
 
       {/* Delete AI Config Confirmation */}
       <AlertDialog open={!!deleteAIConfig} onOpenChange={() => setDeleteAIConfig(null)}>
-        <AlertDialogContent className="bg-slate-900 border-slate-800">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Excluir Configuração</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogTitle className="text-foreground">Excluir Configuração</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
               Tem certeza que deseja excluir a configuração <strong>{deleteAIConfig?.name}</strong>?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+            <AlertDialogCancel className="bg-background border-border text-foreground hover:bg-accent">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
