@@ -83,10 +83,7 @@ export default function Header({ user, collapsed }) {
         {/* Status Selector */}
         <Select value={status} onValueChange={handleStatusChange} disabled={isUpdating}>
           <SelectTrigger className="w-32 bg-background border-border text-foreground">
-            <div className="flex items-center gap-2">
-              <Circle className={cn("w-2 h-2 fill-current", statusColors[status].replace('bg-', 'text-'))} />
-              <SelectValue />
-            </div>
+            <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border">
             {Object.entries(statusLabels).map(([value, label]) => (
