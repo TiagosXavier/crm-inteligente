@@ -18,8 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Sun, Moon, LogOut, User, Bell, Circle } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import NotificationsPanel from './NotificationsPanel';
 
 const statusColors = {
   online: 'bg-emerald-500',
@@ -98,10 +99,7 @@ export default function Header({ user, collapsed }) {
         </Select>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground hover:bg-accent">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full" />
-        </Button>
+        <NotificationsPanel userEmail={user?.email} />
 
         {/* Theme Toggle */}
         <Button
