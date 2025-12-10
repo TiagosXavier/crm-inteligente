@@ -107,12 +107,14 @@ function StatCard({ title, value, icon: Icon, trend, color, isLoading }) {
 
 export default function Dashboard() {
   const [filters, setFilters] = useState({
-    dateUntil: '',
+    dateFrom: '',
+    dateTo: '',
     agent: 'all',
     chartType: 'area'
   });
   const [activeFilters, setActiveFilters] = useState({
-    dateUntil: '',
+    dateFrom: '',
+    dateTo: '',
     agent: 'all',
     chartType: 'area'
   });
@@ -138,12 +140,14 @@ export default function Dashboard() {
 
   const clearFilters = () => {
     setFilters({
-      dateUntil: '',
+      dateFrom: '',
+      dateTo: '',
       agent: 'all',
       chartType: 'area'
     });
     setActiveFilters({
-      dateUntil: '',
+      dateFrom: '',
+      dateTo: '',
       agent: 'all',
       chartType: 'area'
     });
@@ -151,11 +155,21 @@ export default function Dashboard() {
 
   // Apply filters to contacts
   const filteredContacts = contacts.filter(contact => {
-    if (activeFilters.dateUntil && contact.created_date) {
+    if (contact.created_date) {
       const contactDate = new Date(contact.created_date);
-      const filterDate = new Date(activeFilters.dateUntil);
-      if (contactDate > filterDate) return false;
+      
+      if (activeFilters.dateFrom) {
+        const fromDate = new Date(activeFilters.dateFrom);
+        if (contactDate < fromDate) return false;
+      }
+      
+      if (activeFilters.dateTo) {
+        const toDate = new Date(activeFilters.dateTo);
+        toDate.setHours(23, 59, 59, 999);
+        if (contactDate > toDate) return false;
+      }
     }
+    
     if (activeFilters.agent !== 'all' && contact.assigned_to !== activeFilters.agent) {
       return false;
     }
@@ -210,13 +224,23 @@ export default function Dashboard() {
       {/* Filters */}
       <Card className="bg-card border-border">
         <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="space-y-2">
-              <Label className="text-foreground text-sm">Data até</Label>
+              <Label className="text-foreground text-sm">Data Início</Label>
               <Input
                 type="date"
-                value={filters.dateUntil}
-                onChange={(e) => setFilters({ ...filters, dateUntil: e.target.value })}
+                value={filters.dateFrom}
+                onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+                className="bg-background border-border text-foreground"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-foreground text-sm">Data Término</Label>
+              <Input
+                type="date"
+                value={filters.dateTo}
+                onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
                 className="bg-background border-border text-foreground"
               />
             </div>
