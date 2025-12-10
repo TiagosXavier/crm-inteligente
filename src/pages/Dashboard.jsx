@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Users,
   UserCheck,
@@ -12,7 +22,9 @@ import {
   MessageSquare,
   TrendingUp,
   Clock,
-  Phone
+  Phone,
+  Filter,
+  X
 } from 'lucide-react';
 import {
   AreaChart,
@@ -94,6 +106,17 @@ function StatCard({ title, value, icon: Icon, trend, color, isLoading }) {
 }
 
 export default function Dashboard() {
+  const [filters, setFilters] = useState({
+    dateUntil: '',
+    agent: 'all',
+    chartType: 'area'
+  });
+  const [activeFilters, setActiveFilters] = useState({
+    dateUntil: '',
+    agent: 'all',
+    chartType: 'area'
+  });
+
   const { data: contacts = [], isLoading: contactsLoading } = useQuery({
     queryKey: ['contacts'],
     queryFn: () => base44.entities.Contact.list('-created_date', 100),
@@ -109,8 +132,38 @@ export default function Dashboard() {
     queryFn: () => base44.entities.Template.list(),
   });
 
+  const applyFilters = () => {
+    setActiveFilters({ ...filters });
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      dateUntil: '',
+      agent: 'all',
+      chartType: 'area'
+    });
+    setActiveFilters({
+      dateUntil: '',
+      agent: 'all',
+      chartType: 'area'
+    });
+  };
+
+  // Apply filters to contacts
+  const filteredContacts = contacts.filter(contact => {
+    if (activeFilters.dateUntil && contact.created_date) {
+      const contactDate = new Date(contact.created_date);
+      const filterDate = new Date(activeFilters.dateUntil);
+      if (contactDate > filterDate) return false;
+    }
+    if (activeFilters.agent !== 'all' && contact.assigned_to !== activeFilters.agent) {
+      return false;
+    }
+    return true;
+  });
+
   const activeUsers = users.filter(u => u.status === 'online' && u.is_active !== false);
-  const recentContacts = contacts.slice(0, 5);
+  const recentContacts = filteredContacts.slice(0, 5);
   const isLoading = contactsLoading || usersLoading || templatesLoading;
 
   const getInitials = (name) => {
@@ -154,11 +207,77 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Filters */}
+      <Card className="bg-card border-border">
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label className="text-foreground text-sm">Data até</Label>
+              <Input
+                type="date"
+                value={filters.dateUntil}
+                onChange={(e) => setFilters({ ...filters, dateUntil: e.target.value })}
+                className="bg-background border-border text-foreground"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-foreground text-sm">Agente</Label>
+              <Select value={filters.agent} onValueChange={(v) => setFilters({ ...filters, agent: v })}>
+                <SelectTrigger className="bg-background border-border text-foreground">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border-border">
+                  <SelectItem value="all">Todos os Agentes</SelectItem>
+                  {users.map((user) => (
+                    <SelectItem key={user.id} value={user.email}>
+                      {user.full_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-foreground text-sm">Tipo de Gráfico</Label>
+              <Select value={filters.chartType} onValueChange={(v) => setFilters({ ...filters, chartType: v })}>
+                <SelectTrigger className="bg-background border-border text-foreground">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border-border">
+                  <SelectItem value="area">Área</SelectItem>
+                  <SelectItem value="bar">Barras</SelectItem>
+                  <SelectItem value="line">Linha</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-end gap-2">
+              <Button
+                onClick={applyFilters}
+                className="flex-1 bg-primary hover:bg-primary/90 gap-2"
+              >
+                <Filter className="w-4 h-4" />
+                Filtrar
+              </Button>
+              <Button
+                onClick={clearFilters}
+                variant="outline"
+                className="flex-1 gap-2"
+              >
+                <X className="w-4 h-4" />
+                Limpar
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total de Contatos"
-          value={contacts.length}
+          value={filteredContacts.length}
           icon={Users}
           trend="+12% este mês"
           color="bg-indigo-500"
@@ -197,7 +316,8 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
-              <AreaChart data={conversationsData}>
+              {activeFilters.chartType === 'area' ? (
+                <AreaChart data={conversationsData}>
                 <defs>
                   <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
@@ -222,10 +342,47 @@ export default function Dashboard() {
                   strokeWidth={2}
                   fillOpacity={1}
                   fill="url(#colorValue)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
+                  />
+                  </AreaChart>
+                  ) : activeFilters.chartType === 'bar' ? (
+                  <BarChart data={conversationsData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <XAxis dataKey="name" stroke="#64748b" />
+                  <YAxis stroke="#64748b" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      borderRadius: '8px',
+                      color: '#fff'
+                    }}
+                  />
+                  <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                  ) : (
+                  <AreaChart data={conversationsData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <XAxis dataKey="name" stroke="#64748b" />
+                  <YAxis stroke="#64748b" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      borderRadius: '8px',
+                      color: '#fff'
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#6366f1"
+                    strokeWidth={2}
+                    fill="none"
+                  />
+                  </AreaChart>
+                  )}
+                  </ResponsiveContainer>
+                  </CardContent>
         </Card>
 
         {/* Category Distribution */}
