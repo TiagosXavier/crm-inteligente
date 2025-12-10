@@ -224,62 +224,64 @@ export default function Dashboard() {
       {/* Filters */}
       <Card className="bg-card border-border">
         <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="space-y-2">
-              <Label className="text-foreground text-sm">Data Início</Label>
-              <Input
-                type="date"
-                value={filters.dateFrom}
-                onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                className="bg-background border-border text-foreground"
-              />
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Data Início</Label>
+                <Input
+                  type="date"
+                  value={filters.dateFrom}
+                  onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+                  className="bg-background border-border text-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Data Término</Label>
+                <Input
+                  type="date"
+                  value={filters.dateTo}
+                  onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+                  className="bg-background border-border text-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Agente</Label>
+                <Select value={filters.agent} onValueChange={(v) => setFilters({ ...filters, agent: v })}>
+                  <SelectTrigger className="bg-background border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border">
+                    <SelectItem value="all">Todos os Agentes</SelectItem>
+                    {users.map((user) => (
+                      <SelectItem key={user.id} value={user.email}>
+                        {user.full_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Tipo de Gráfico</Label>
+                <Select value={filters.chartType} onValueChange={(v) => setFilters({ ...filters, chartType: v })}>
+                  <SelectTrigger className="bg-background border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border">
+                    <SelectItem value="area">Área</SelectItem>
+                    <SelectItem value="bar">Barras</SelectItem>
+                    <SelectItem value="line">Linha</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-foreground text-sm">Data Término</Label>
-              <Input
-                type="date"
-                value={filters.dateTo}
-                onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                className="bg-background border-border text-foreground"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-foreground text-sm">Agente</Label>
-              <Select value={filters.agent} onValueChange={(v) => setFilters({ ...filters, agent: v })}>
-                <SelectTrigger className="bg-background border-border text-foreground">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border-border">
-                  <SelectItem value="all">Todos os Agentes</SelectItem>
-                  {users.map((user) => (
-                    <SelectItem key={user.id} value={user.email}>
-                      {user.full_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-foreground text-sm">Tipo de Gráfico</Label>
-              <Select value={filters.chartType} onValueChange={(v) => setFilters({ ...filters, chartType: v })}>
-                <SelectTrigger className="bg-background border-border text-foreground">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border-border">
-                  <SelectItem value="area">Área</SelectItem>
-                  <SelectItem value="bar">Barras</SelectItem>
-                  <SelectItem value="line">Linha</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-end gap-2">
+            <div className="flex gap-2 justify-end">
               <Button
                 onClick={applyFilters}
-                className="flex-1 bg-primary hover:bg-primary/90 gap-2"
+                className="bg-primary hover:bg-primary/90 gap-2"
               >
                 <Filter className="w-4 h-4" />
                 Filtrar
@@ -287,7 +289,7 @@ export default function Dashboard() {
               <Button
                 onClick={clearFilters}
                 variant="outline"
-                className="flex-1 gap-2"
+                className="gap-2"
               >
                 <X className="w-4 h-4" />
                 Limpar
