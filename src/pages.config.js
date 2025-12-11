@@ -1,21 +1,23 @@
-import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 import Contacts from './pages/Contacts';
-import Templates from './pages/Templates';
-import Team from './pages/Team';
 import Conversations from './pages/Conversations';
+import Dashboard from './pages/Dashboard';
 import Pipeline from './pages/Pipeline';
 import Settings from './pages/Settings';
+import Team from './pages/Team';
+import Templates from './pages/Templates';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Dashboard": Dashboard,
+    "Home": Home,
     "Contacts": Contacts,
-    "Templates": Templates,
-    "Team": Team,
     "Conversations": Conversations,
+    "Dashboard": Dashboard,
     "Pipeline": Pipeline,
     "Settings": Settings,
+    "Team": Team,
+    "Templates": Templates,
 }
 
 export const pagesConfig = {
