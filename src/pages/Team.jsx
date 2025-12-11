@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
+import InviteUserDialog from '../components/team/InviteUserDialog';
 import {
   Dialog,
   DialogContent,
@@ -74,6 +75,7 @@ export default function Team() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [deleteUser, setDeleteUser] = useState(null);
   const [formData, setFormData] = useState({
@@ -181,7 +183,10 @@ export default function Team() {
           <p className="text-muted-foreground">Gerencie os agentes do seu time</p>
         </div>
         {isAdmin && (
-          <Button className="bg-primary hover:bg-primary/90 gap-2" disabled>
+          <Button 
+            className="bg-primary hover:bg-primary/90 gap-2"
+            onClick={() => setIsInviteOpen(true)}
+          >
             <Plus className="w-4 h-4" />
             Convidar Usuário
           </Button>
@@ -363,6 +368,9 @@ export default function Team() {
           ))}
         </div>
       )}
+
+      {/* Invite User Dialog */}
+      <InviteUserDialog open={isInviteOpen} onOpenChange={setIsInviteOpen} />
 
       {/* Edit Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
