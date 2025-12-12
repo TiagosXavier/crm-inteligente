@@ -7,6 +7,15 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import {
   DragDropContext,
@@ -20,7 +29,9 @@ import {
   Clock,
   GripVertical,
   Users,
-  Plus
+  Plus,
+  Filter,
+  X
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -37,9 +48,23 @@ export default function Pipeline() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  const [filters, setFilters] = useState({
+    name: '',
+    phone: '',
+    status: 'all',
+    assignedTo: 'all',
+    stage: 'all',
+    sortBy: 'created_date',
+  });
+
   const { data: contacts = [], isLoading } = useQuery({
     queryKey: ['contacts'],
     queryFn: () => base44.entities.Contact.list('-created_date'),
+  });
+
+  const { data: users = [] } = useQuery({
+    queryKey: ['users'],
+    queryFn: () => base44.entities.User.list(),
   });
 
   const updateMutation = useMutation({
@@ -49,9 +74,72 @@ export default function Pipeline() {
     },
   });
 
-  const getContactsByStatus = (status) => {
-    return contacts.filter((c) => c.status === status);
+  const getFilteredContacts = () => {
+    let filtered = [...contacts];
+
+    // Filter by name
+    if (filters.name) {
+      filtered = filtered.filter(c => 
+        c.name?.toLowerCase().includes(filters.name.toLowerCase())
+      );
+    }
+
+    // Filter by phone
+    if (filters.phone) {
+      filtered = filtered.filter(c => 
+        c.phone?.includes(filters.phone)
+      );
+    }
+
+    // Filter by status
+    if (filters.status !== 'all') {
+      filtered = filtered.filter(c => c.status === filters.status);
+    }
+
+    // Filter by assigned agent
+    if (filters.assignedTo !== 'all') {
+      filtered = filtered.filter(c => c.assigned_to === filters.assignedTo);
+    }
+
+    // Filter by stage (same as status)
+    if (filters.stage !== 'all') {
+      filtered = filtered.filter(c => c.status === filters.stage);
+    }
+
+    // Sort
+    if (filters.sortBy === 'created_date') {
+      filtered.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+    } else if (filters.sortBy === 'name') {
+      filtered.sort((a, b) => a.name?.localeCompare(b.name || '') || 0);
+    } else if (filters.sortBy === 'last_contact') {
+      filtered.sort((a, b) => {
+        if (!a.last_contact) return 1;
+        if (!b.last_contact) return -1;
+        return new Date(b.last_contact) - new Date(a.last_contact);
+      });
+    }
+
+    return filtered;
   };
+
+  const getContactsByStatus = (status) => {
+    const filteredContacts = getFilteredContacts();
+    return filteredContacts.filter((c) => c.status === status);
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      name: '',
+      phone: '',
+      status: 'all',
+      assignedTo: 'all',
+      stage: 'all',
+      sortBy: 'created_date',
+    });
+  };
+
+  const hasActiveFilters = filters.name || filters.phone || filters.status !== 'all' || 
+    filters.assignedTo !== 'all' || filters.stage !== 'all' || filters.sortBy !== 'created_date';
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -104,16 +192,128 @@ export default function Pipeline() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Pipeline</h1>
-          <p className="text-slate-400">Acompanhe o funil de atendimento</p>
+          <h1 className="text-2xl font-bold text-foreground">Pipeline</h1>
+          <p className="text-muted-foreground">Acompanhe o funil de atendimento</p>
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4" />
-            <span>{contacts.length} contatos no funil</span>
+            <span>{getFilteredContacts().length} de {contacts.length} contatos</span>
           </div>
         </div>
       </div>
+
+      {/* Filters */}
+      <Card className="bg-card border-border">
+        <CardContent className="p-4">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Nome do Cliente</Label>
+                <Input
+                  placeholder="Buscar por nome..."
+                  value={filters.name}
+                  onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+                  className="bg-background border-border text-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Telefone</Label>
+                <Input
+                  placeholder="Buscar por telefone..."
+                  value={filters.phone}
+                  onChange={(e) => setFilters({ ...filters, phone: e.target.value })}
+                  className="bg-background border-border text-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Status</Label>
+                <Select value={filters.status} onValueChange={(v) => setFilters({ ...filters, status: v })}>
+                  <SelectTrigger className="bg-background border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border">
+                    <SelectItem value="all">Todos</SelectItem>
+                    {contacts.some(c => c.status) && (
+                      <>
+                        <SelectItem value="novo">Novo</SelectItem>
+                        <SelectItem value="em_atendimento">Em Atendimento</SelectItem>
+                        <SelectItem value="aguardando">Aguardando</SelectItem>
+                        <SelectItem value="resolvido">Resolvido</SelectItem>
+                        <SelectItem value="escalado">Escalado</SelectItem>
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Atendente</Label>
+                <Select value={filters.assignedTo} onValueChange={(v) => setFilters({ ...filters, assignedTo: v })}>
+                  <SelectTrigger className="bg-background border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border">
+                    <SelectItem value="all">Todos</SelectItem>
+                    {users.map((user) => (
+                      <SelectItem key={user.id} value={user.email}>
+                        {user.full_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Etapa</Label>
+                <Select value={filters.stage} onValueChange={(v) => setFilters({ ...filters, stage: v })}>
+                  <SelectTrigger className="bg-background border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border">
+                    <SelectItem value="all">Todas</SelectItem>
+                    {stages.map((stage) => (
+                      <SelectItem key={stage.id} value={stage.id}>
+                        {stage.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Ordenar por</Label>
+                <Select value={filters.sortBy} onValueChange={(v) => setFilters({ ...filters, sortBy: v })}>
+                  <SelectTrigger className="bg-background border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border">
+                    <SelectItem value="created_date">Data de Criação</SelectItem>
+                    <SelectItem value="name">Nome</SelectItem>
+                    <SelectItem value="last_contact">Último Contato</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {hasActiveFilters && (
+              <div className="flex justify-end">
+                <Button
+                  onClick={clearFilters}
+                  variant="outline"
+                  className="gap-2"
+                  size="sm"
+                >
+                  <X className="w-4 h-4" />
+                  Limpar Filtros
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Kanban Board */}
       <DragDropContext onDragEnd={handleDragEnd}>
