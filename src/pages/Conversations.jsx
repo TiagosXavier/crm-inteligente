@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
@@ -44,6 +44,19 @@ export default function Conversations() {
     queryKey: ['contacts'],
     queryFn: () => base44.entities.Contact.list('-created_date'),
   });
+
+  // Check for contactId in URL params and auto-select contact
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const contactId = urlParams.get('contactId');
+    
+    if (contactId && contacts.length > 0) {
+      const contact = contacts.find(c => c.id === contactId);
+      if (contact) {
+        setSelectedContact(contact);
+      }
+    }
+  }, [contacts]);
 
   const filteredContacts = contacts.filter((contact) =>
     contact.name?.toLowerCase().includes(search.toLowerCase()) ||
