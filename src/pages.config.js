@@ -6,6 +6,7 @@ import Settings from './pages/Settings';
 import Team from './pages/Team';
 import Templates from './pages/Templates';
 import Conversations from './pages/Conversations';
+import Profile from './pages/Profile';
 import __Layout from './Layout.jsx';
 
 
@@ -18,6 +19,7 @@ export const PAGES = {
     "Team": Team,
     "Templates": Templates,
     "Conversations": Conversations,
+    "Profile": Profile,
 }
 
 export const pagesConfig = {

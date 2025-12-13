@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +9,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { createPageUrl } from '@/utils';
+import AgentsOnlineDialog from '../components/dashboard/AgentsOnlineDialog';
+import ActiveTemplatesDialog from '../components/dashboard/ActiveTemplatesDialog';
+import TodayConversationsDialog from '../components/dashboard/TodayConversationsDialog';
 import {
   Select,
   SelectContent,
@@ -70,7 +75,7 @@ const responseTimeData = [
   { hour: '18h', avg: 2.1 },
 ];
 
-function StatCard({ title, value, icon: Icon, trend, color, isLoading }) {
+function StatCard({ title, value, icon: Icon, trend, color, isLoading, onClick }) {
   if (isLoading) {
     return (
       <Card className="bg-card border-border">
@@ -83,7 +88,10 @@ function StatCard({ title, value, icon: Icon, trend, color, isLoading }) {
   }
 
   return (
-    <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300 group">
+    <Card 
+      className={`bg-card border-border hover:border-primary/50 transition-all duration-300 group ${onClick ? 'cursor-pointer' : ''}`}
+      onClick={onClick}
+    >
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div>
@@ -106,6 +114,7 @@ function StatCard({ title, value, icon: Icon, trend, color, isLoading }) {
 }
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState({
     dateFrom: '',
     dateTo: '',
@@ -118,6 +127,9 @@ export default function Dashboard() {
     agent: 'all',
     chartType: 'area'
   });
+  const [showAgentsDialog, setShowAgentsDialog] = useState(false);
+  const [showTemplatesDialog, setShowTemplatesDialog] = useState(false);
+  const [showConversationsDialog, setShowConversationsDialog] = useState(false);
 
   const { data: contacts = [], isLoading: contactsLoading } = useQuery({
     queryKey: ['contacts'],
@@ -308,6 +320,7 @@ export default function Dashboard() {
           trend="+12% este mês"
           color="bg-indigo-500"
           isLoading={isLoading}
+          onClick={() => navigate(createPageUrl('Contacts'))}
         />
         <StatCard
           title="Agentes Online"
@@ -315,6 +328,7 @@ export default function Dashboard() {
           icon={UserCheck}
           color="bg-emerald-500"
           isLoading={isLoading}
+          onClick={() => setShowAgentsDialog(true)}
         />
         <StatCard
           title="Templates Ativos"
@@ -322,16 +336,35 @@ export default function Dashboard() {
           icon={FileText}
           color="bg-amber-500"
           isLoading={isLoading}
+          onClick={() => setShowTemplatesDialog(true)}
         />
         <StatCard
           title="Conversas Hoje"
-          value="127"
+          value={filteredContacts.filter(c => c.created_date && new Date(c.created_date).toDateString() === new Date().toDateString()).length}
           icon={MessageSquare}
           trend="+8% vs ontem"
           color="bg-purple-500"
           isLoading={isLoading}
+          onClick={() => setShowConversationsDialog(true)}
         />
       </div>
+
+      {/* Dialogs */}
+      <AgentsOnlineDialog 
+        open={showAgentsDialog} 
+        onOpenChange={setShowAgentsDialog}
+        users={users}
+      />
+      <ActiveTemplatesDialog 
+        open={showTemplatesDialog} 
+        onOpenChange={setShowTemplatesDialog}
+        templates={templates}
+      />
+      <TodayConversationsDialog 
+        open={showConversationsDialog} 
+        onOpenChange={setShowConversationsDialog}
+        contacts={filteredContacts}
+      />
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

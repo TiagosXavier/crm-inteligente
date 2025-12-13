@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useTheme } from '@/components/ui/ThemeProvider';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { createPageUrl } from '@/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -136,9 +138,11 @@ export default function Header({ user, collapsed }) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem className="text-foreground hover:bg-accent cursor-pointer">
-              <User className="mr-2 h-4 w-4" />
-              Meu Perfil
+            <DropdownMenuItem asChild className="text-foreground hover:bg-accent cursor-pointer">
+              <Link to={createPageUrl('Profile')} className="flex items-center">
+                <User className="mr-2 h-4 w-4" />
+                Meu Perfil
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border" />
             <DropdownMenuItem 
