@@ -519,7 +519,8 @@ export default function Dashboard() {
                 {recentContacts.map((contact) => (
                   <div
                     key={contact.id}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-accent/50 hover:bg-accent transition-colors"
+                    onClick={() => navigate(createPageUrl('Conversations') + `?contactId=${contact.id}`)}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-accent/50 hover:bg-accent transition-colors cursor-pointer"
                   >
                     <Avatar className="w-10 h-10">
                       <AvatarFallback className="bg-primary text-primary-foreground text-sm">
