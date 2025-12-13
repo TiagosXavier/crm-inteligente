@@ -158,7 +158,7 @@ export default function ContactFormDialog({ open, onOpenChange, contact, onSave,
               value={formData.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
               placeholder="(00) 00000-0000"
-              className={`bg-slate-800 border-slate-700 ${errors.phone ? 'border-rose-500' : ''}`}
+              className={`bg-background border-border ${errors.phone ? 'border-rose-500' : ''}`}
             />
             {errors.phone && <p className="text-xs text-rose-500">{errors.phone}</p>}
           </div>
@@ -171,7 +171,7 @@ export default function ContactFormDialog({ open, onOpenChange, contact, onSave,
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
               placeholder="email@exemplo.com"
-              className={`bg-slate-800 border-slate-700 ${errors.email ? 'border-rose-500' : ''}`}
+              className={`bg-background border-border ${errors.email ? 'border-rose-500' : ''}`}
             />
             {errors.email && <p className="text-xs text-rose-500">{errors.email}</p>}
           </div>
@@ -184,7 +184,7 @@ export default function ContactFormDialog({ open, onOpenChange, contact, onSave,
                 value={formData.cpf}
                 onChange={(e) => handleChange('cpf', e.target.value)}
                 placeholder="000.000.000-00"
-                className={`bg-slate-800 border-slate-700 ${errors.cpf ? 'border-rose-500' : ''}`}
+                className={`bg-background border-border ${errors.cpf ? 'border-rose-500' : ''}`}
               />
               {errors.cpf && <p className="text-xs text-rose-500">{errors.cpf}</p>}
             </div>
@@ -249,7 +249,7 @@ export default function ContactFormDialog({ open, onOpenChange, contact, onSave,
               value={formData.notes}
               onChange={(e) => handleChange('notes', e.target.value)}
               placeholder="Notas sobre o contato..."
-              className="bg-slate-800 border-slate-700 min-h-[80px]"
+              className="bg-background border-border min-h-[80px]"
             />
           </div>
 

@@ -463,7 +463,7 @@ export default function Settings() {
                   value={aiFormData.provider}
                   onValueChange={(v) => setAIFormData({ ...aiFormData, provider: v, model: models[v][0] })}
                 >
-                  <SelectTrigger className="bg-slate-800 border-slate-700">
+                  <SelectTrigger className="bg-background border-border">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border-border">
@@ -481,7 +481,7 @@ export default function Settings() {
                   value={aiFormData.model}
                   onValueChange={(v) => setAIFormData({ ...aiFormData, model: v })}
                 >
-                  <SelectTrigger className="bg-slate-800 border-slate-700">
+                  <SelectTrigger className="bg-background border-border">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border-border">
@@ -499,7 +499,7 @@ export default function Settings() {
                 value={aiFormData.system_prompt}
                 onChange={(e) => setAIFormData({ ...aiFormData, system_prompt: e.target.value })}
                 placeholder="Instruções para o modelo..."
-                className="bg-slate-800 border-slate-700 min-h-[100px]"
+                className="bg-background border-border min-h-[100px]"
               />
             </div>
 
