@@ -45,6 +45,7 @@ import {
   Pie,
   Cell
 } from 'recharts';
+import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -244,7 +245,7 @@ export default function Dashboard() {
                   type="date"
                   value={filters.dateFrom}
                   onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                  className="bg-background border-border text-foreground"
+                  className="bg-background border-border text-foreground [color-scheme:light] dark:[color-scheme:dark]"
                 />
               </div>
 
@@ -254,7 +255,7 @@ export default function Dashboard() {
                   type="date"
                   value={filters.dateTo}
                   onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                  className="bg-background border-border text-foreground"
+                  className="bg-background border-border text-foreground [color-scheme:light] dark:[color-scheme:dark]"
                 />
               </div>
 
