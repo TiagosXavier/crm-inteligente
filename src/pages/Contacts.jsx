@@ -167,6 +167,40 @@ export default function Contacts() {
     return option?.label || status;
   };
 
+  const handleExport = () => {
+    // Create CSV content
+    const headers = ['Nome', 'Telefone', 'Email', 'CPF', 'Empresa', 'Status', 'Tags', 'Observações', 'Data de Criação'];
+    const csvData = filteredContacts.map(contact => [
+      contact.name || '',
+      contact.phone || '',
+      contact.email || '',
+      contact.cpf || '',
+      contact.company || '',
+      getStatusLabel(contact.status),
+      contact.tags?.join('; ') || '',
+      contact.notes || '',
+      contact.created_date ? format(new Date(contact.created_date), 'dd/MM/yyyy HH:mm', { locale: ptBR }) : ''
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    // Create blob and download
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `contatos_${format(new Date(), 'dd-MM-yyyy_HH-mm')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({ title: `${filteredContacts.length} contatos exportados com sucesso!` });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -176,7 +210,7 @@ export default function Contacts() {
           <p className="text-muted-foreground">Gerencie seus clientes e leads</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={handleExport}>
             <Download className="w-4 h-4" />
             <span className="hidden md:inline">Exportar</span>
           </Button>
