@@ -199,7 +199,7 @@ export default function Templates() {
                 <Tag className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700">
+              <SelectContent className="bg-popover border-border">
                 <SelectItem value="all">Todas Categorias</SelectItem>
                 {categories.map((cat) => (
                   <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
@@ -347,7 +347,7 @@ export default function Templates() {
                 value={formData.category}
                 onValueChange={(v) => setFormData({ ...formData, category: v })}
               >
-                <SelectTrigger className="bg-slate-800 border-slate-700">
+                <SelectTrigger className="bg-background border-border">
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border">
@@ -373,7 +373,7 @@ export default function Templates() {
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="Escreva o conteúdo do template..."
-                className="bg-slate-800 border-slate-700 min-h-[120px]"
+                className="bg-background border-border min-h-[120px]"
               />
             </div>
           </div>
