@@ -151,15 +151,36 @@ export default function Team() {
   };
 
   const handleSave = () => {
-    if (selectedUser) {
-      // Only update editable fields - NEVER try to update email or full_name for built-in User
-      const updateData = {
-        status: formData.status,
-        max_simultaneous: formData.max_simultaneous,
-        is_active: formData.is_active,
-      };
-      updateMutation.mutate({ id: selectedUser.id, data: updateData });
+    if (!selectedUser) return;
+    
+    // Security: Prevent editing own account or other admins (unless you're the main admin)
+    if (selectedUser.id === currentUser?.id) {
+      toast({ 
+        title: 'Não é possível editar sua própria conta', 
+        description: 'Use a página de Perfil para editar seus dados.',
+        variant: 'destructive' 
+      });
+      return;
     }
+    
+    // Security: Only admin can edit other users
+    if (!isAdmin) {
+      toast({ 
+        title: 'Sem permissão', 
+        description: 'Apenas administradores podem editar usuários.',
+        variant: 'destructive' 
+      });
+      return;
+    }
+    
+    // Only update editable fields - NEVER try to update email, full_name, or role for built-in User
+    const updateData = {
+      status: formData.status,
+      max_simultaneous: formData.max_simultaneous,
+      is_active: formData.is_active,
+    };
+    
+    updateMutation.mutate({ id: selectedUser.id, data: updateData });
   };
 
   const getInitials = (name) => {
@@ -267,7 +288,7 @@ export default function Team() {
                 <Shield className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Cargo" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700">
+              <SelectContent className="bg-popover border-border">
                 <SelectItem value="all">Todos os Cargos</SelectItem>
                 <SelectItem value="admin">Administrador</SelectItem>
                 <SelectItem value="supervisor">Supervisor</SelectItem>
@@ -328,7 +349,7 @@ export default function Team() {
                       <p className="text-sm text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
-                  {isAdmin && (
+                  {isAdmin && user.id !== currentUser?.id && (
                     <Button
                       variant="ghost"
                       size="icon"

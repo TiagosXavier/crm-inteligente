@@ -34,28 +34,9 @@ export default function InviteUserDialog({ open, onOpenChange }) {
 
   const inviteMutation = useMutation({
     mutationFn: async (data) => {
-      // Send email invitation
-      await base44.integrations.Core.SendEmail({
-        to: data.email,
-        subject: 'Convite para CRM Smart',
-        from_name: 'CRM Smart',
-        body: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #6366f1;">Bem-vindo ao CRM Smart!</h1>
-            <p>Olá ${data.full_name},</p>
-            <p>Você foi convidado para fazer parte da equipe no CRM Smart.</p>
-            <p>Seu perfil foi configurado como: <strong>${getRoleLabel(data.role)}</strong></p>
-            <p>Para começar, acesse a plataforma e faça login com este email.</p>
-            <div style="margin: 30px 0; text-align: center;">
-              <a href="${window.location.origin}" style="background-color: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
-                Acessar CRM Smart
-              </a>
-            </div>
-            <p style="color: #64748b; font-size: 14px;">Se você não esperava este convite, por favor ignore este email.</p>
-          </div>
-        `,
-      });
-
+      // Use the correct Base44 API to invite user
+      await base44.users.inviteUser(data.email, data.role);
+      
       // Create notification for the new user
       await base44.entities.Notification.create({
         title: 'Bem-vindo ao CRM Smart!',
