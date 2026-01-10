@@ -2,6 +2,14 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @param {Object} props
+ * @param {string} [props.className]
+ * @param {string} [props.id]
+ * @param {string} [props.value]
+ * @param {string} [props.placeholder]
+ * @param {(e: any) => void} [props.onChange]
+ */
 const Textarea = React.forwardRef(({ className, ...props }, ref) => {
   return (
     (<textarea
