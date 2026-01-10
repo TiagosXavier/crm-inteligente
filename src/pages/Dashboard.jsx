@@ -10,9 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createPageUrl } from '@/utils';
+import MetricsCard from '../components/dashboard/MetricsCard';
 import AgentsOnlineDialog from '../components/dashboard/AgentsOnlineDialog';
 import ActiveTemplatesDialog from '../components/dashboard/ActiveTemplatesDialog';
 import TodayConversationsDialog from '../components/dashboard/TodayConversationsDialog';
+import ExportReportDialog from '../components/dashboard/ExportReportDialog';
+import PerformanceChart from '../components/dashboard/PerformanceChart';
 import {
   Select,
   SelectContent,
@@ -29,7 +32,10 @@ import {
   Clock,
   Phone,
   Filter,
-  X
+  X,
+  FileDown,
+  Target,
+  Zap
 } from 'lucide-react';
 import {
   AreaChart,
@@ -49,70 +55,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-// Mock data for charts
-const conversationsData = [
-  { name: 'Seg', value: 45 },
-  { name: 'Ter', value: 52 },
-  { name: 'Qua', value: 38 },
-  { name: 'Qui', value: 65 },
-  { name: 'Sex', value: 48 },
-  { name: 'Sáb', value: 22 },
-  { name: 'Dom', value: 15 },
-];
 
-const categoryData = [
-  { name: 'Suporte', value: 35, color: '#6366f1' },
-  { name: 'Vendas', value: 28, color: '#10b981' },
-  { name: 'Informações', value: 22, color: '#f59e0b' },
-  { name: 'Outros', value: 15, color: '#64748b' },
-];
-
-const responseTimeData = [
-  { hour: '08h', avg: 2.5 },
-  { hour: '10h', avg: 3.2 },
-  { hour: '12h', avg: 4.1 },
-  { hour: '14h', avg: 2.8 },
-  { hour: '16h', avg: 3.5 },
-  { hour: '18h', avg: 2.1 },
-];
-
-function StatCard({ title, value, icon: Icon, trend, color, isLoading, onClick }) {
-  if (isLoading) {
-    return (
-      <Card className="bg-card border-border">
-        <CardContent className="p-6">
-          <Skeleton className="h-4 w-24 mb-2" />
-          <Skeleton className="h-8 w-16" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card 
-      className={`bg-card border-border hover:border-primary/50 transition-all duration-300 group ${onClick ? 'cursor-pointer' : ''}`}
-      onClick={onClick}
-    >
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground mb-1">{title}</p>
-            <p className="text-3xl font-bold text-foreground">{value}</p>
-            {trend && (
-              <div className="flex items-center gap-1 mt-2">
-                <TrendingUp className="w-4 h-4 text-emerald-500" />
-                <span className="text-sm text-emerald-500">{trend}</span>
-              </div>
-            )}
-          </div>
-          <div className={`p-3 rounded-xl ${color} bg-opacity-20 group-hover:bg-opacity-30 transition-all`}>
-            <Icon className={`w-6 h-6 ${color.replace('bg-', 'text-')}`} />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -131,6 +74,7 @@ export default function Dashboard() {
   const [showAgentsDialog, setShowAgentsDialog] = useState(false);
   const [showTemplatesDialog, setShowTemplatesDialog] = useState(false);
   const [showConversationsDialog, setShowConversationsDialog] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   const { data: contacts = [], isLoading: contactsLoading } = useQuery({
     queryKey: ['contacts'],
@@ -193,6 +137,53 @@ export default function Dashboard() {
   const recentContacts = filteredContacts.slice(0, 5);
   const isLoading = contactsLoading || usersLoading || templatesLoading;
 
+  // Calculate real metrics
+  const today = new Date();
+  const thisMonth = filteredContacts.filter(c => {
+    if (!c.created_date) return false;
+    const date = new Date(c.created_date);
+    return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+  });
+
+  const lastMonth = contacts.filter(c => {
+    if (!c.created_date) return false;
+    const date = new Date(c.created_date);
+    const lastMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    return date.getMonth() === lastMonthDate.getMonth() && date.getFullYear() === lastMonthDate.getFullYear();
+  });
+
+  const resolved = filteredContacts.filter(c => c.status === 'resolvido');
+  const conversionRate = filteredContacts.length > 0 ? ((resolved.length / filteredContacts.length) * 100).toFixed(1) : 0;
+  const monthGrowth = lastMonth.length > 0 ? (((thisMonth.length - lastMonth.length) / lastMonth.length) * 100).toFixed(1) : 0;
+
+  // Generate weekly data
+  const getWeeklyData = () => {
+    const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const data = weekDays.map((name, index) => {
+      const count = filteredContacts.filter(c => {
+        if (!c.created_date) return false;
+        const date = new Date(c.created_date);
+        const daysAgo = Math.floor((today - date) / (1000 * 60 * 60 * 24));
+        const dayOfWeek = date.getDay();
+        return daysAgo < 7 && dayOfWeek === index;
+      }).length;
+      return { name, value: count };
+    });
+    return data;
+  };
+
+  const conversationsData = getWeeklyData();
+
+  // Category distribution
+  const categoryData = [
+    { name: 'Novo', value: filteredContacts.filter(c => c.status === 'novo').length, color: '#3b82f6' },
+    { name: 'Em Atendimento', value: filteredContacts.filter(c => c.status === 'em_atendimento').length, color: '#f59e0b' },
+    { name: 'Resolvido', value: filteredContacts.filter(c => c.status === 'resolvido').length, color: '#10b981' },
+    { name: 'Outros', value: filteredContacts.filter(c => !['novo', 'em_atendimento', 'resolvido'].includes(c.status)).length, color: '#64748b' },
+  ].filter(item => item.value > 0);
+
+  const avgResponseTime = '2.5'; // Mock for now
+
   const getInitials = (name) => {
     if (!name) return '?';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -228,9 +219,19 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
           <p className="text-muted-foreground">Visão geral do seu CRM</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-slate-400">
-          <Clock className="w-4 h-4" />
-          {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() => setShowExportDialog(true)}
+            variant="outline"
+            className="gap-2"
+          >
+            <FileDown className="w-4 h-4" />
+            Exportar Relatório
+          </Button>
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
+          </div>
         </div>
       </div>
 
@@ -313,38 +314,53 @@ export default function Dashboard() {
       </Card>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <MetricsCard
           title="Total de Contatos"
           value={filteredContacts.length}
+          subtitle={`${thisMonth.length} novos este mês`}
           icon={Users}
-          trend="+12% este mês"
+          trend={monthGrowth > 0 ? 'up' : 'down'}
+          trendValue={`${Math.abs(monthGrowth)}% vs mês anterior`}
           color="bg-indigo-500"
           isLoading={isLoading}
           onClick={() => navigate(createPageUrl('Contacts'))}
         />
-        <StatCard
+        <MetricsCard
+          title="Taxa de Conversão"
+          value={`${conversionRate}%`}
+          subtitle={`${resolved.length} resolvidos`}
+          icon={Target}
+          trend={conversionRate >= 50 ? 'up' : 'down'}
+          trendValue={conversionRate >= 50 ? 'Acima da meta' : 'Abaixo da meta'}
+          color="bg-emerald-500"
+          isLoading={isLoading}
+        />
+        <MetricsCard
           title="Agentes Online"
           value={activeUsers.length}
+          subtitle={`${users.length} total`}
           icon={UserCheck}
-          color="bg-emerald-500"
+          color="bg-amber-500"
           isLoading={isLoading}
           onClick={() => setShowAgentsDialog(true)}
         />
-        <StatCard
-          title="Templates Ativos"
-          value={templates.filter(t => t.is_active !== false).length}
-          icon={FileText}
-          color="bg-amber-500"
+        <MetricsCard
+          title="Tempo de Resposta"
+          value={`${avgResponseTime} min`}
+          subtitle="Média geral"
+          icon={Zap}
+          trend="up"
+          trendValue="15% mais rápido"
+          color="bg-purple-500"
           isLoading={isLoading}
-          onClick={() => setShowTemplatesDialog(true)}
         />
-        <StatCard
+        <MetricsCard
           title="Conversas Hoje"
           value={filteredContacts.filter(c => c.created_date && new Date(c.created_date).toDateString() === new Date().toDateString()).length}
+          subtitle={`${templates.filter(t => t.is_active !== false).length} templates ativos`}
           icon={MessageSquare}
-          trend="+8% vs ontem"
-          color="bg-purple-500"
+          color="bg-rose-500"
           isLoading={isLoading}
           onClick={() => setShowConversationsDialog(true)}
         />
@@ -366,6 +382,16 @@ export default function Dashboard() {
         onOpenChange={setShowConversationsDialog}
         contacts={filteredContacts}
       />
+      <ExportReportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        contacts={contacts}
+        users={users}
+        templates={templates}
+      />
+
+      {/* Performance Chart */}
+      <PerformanceChart users={users} contacts={filteredContacts} />
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -491,9 +517,9 @@ export default function Dashboard() {
       </div>
 
       {/* Bottom Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Contacts */}
-        <Card className="bg-card border-border lg:col-span-2">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-foreground text-lg">Últimos Contatos</CardTitle>
           </CardHeader>
@@ -545,28 +571,47 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Response Time */}
+        {/* Status Distribution */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-foreground text-lg">Tempo de Resposta (min)</CardTitle>
+            <CardTitle className="text-foreground text-lg">Distribuição por Status</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={responseTimeData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="hour" stroke="#64748b" />
-                <YAxis stroke="#64748b" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#1e293b',
-                    border: '1px solid #334155',
-                    borderRadius: '8px',
-                    color: '#fff'
-                  }}
-                />
-                <Bar dataKey="avg" fill="#10b981" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="space-y-4">
+              {['novo', 'em_atendimento', 'aguardando', 'resolvido', 'escalado'].map((status) => {
+                const count = filteredContacts.filter(c => c.status === status).length;
+                const percentage = filteredContacts.length > 0 ? (count / filteredContacts.length) * 100 : 0;
+                const labels = {
+                  novo: 'Novo',
+                  em_atendimento: 'Em Atendimento',
+                  aguardando: 'Aguardando',
+                  resolvido: 'Resolvido',
+                  escalado: 'Escalado',
+                };
+                const colors = {
+                  novo: 'bg-blue-500',
+                  em_atendimento: 'bg-amber-500',
+                  aguardando: 'bg-purple-500',
+                  resolvido: 'bg-emerald-500',
+                  escalado: 'bg-rose-500',
+                };
+                
+                return (
+                  <div key={status} className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">{labels[status]}</span>
+                      <span className="text-muted-foreground">{count} ({percentage.toFixed(0)}%)</span>
+                    </div>
+                    <div className="w-full bg-secondary rounded-full h-2">
+                      <div 
+                        className={`${colors[status]} h-2 rounded-full transition-all duration-500`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </CardContent>
         </Card>
       </div>
