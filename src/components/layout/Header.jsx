@@ -47,7 +47,7 @@ export default function Header({ user, collapsed }) {
       await base44.auth.updateMe({ status: newStatus });
       setStatus(newStatus);
     } catch (error) {
-      console.error('Error updating status:', error);
+      // Status update failed silently
     } finally {
       setIsUpdating(false);
     }

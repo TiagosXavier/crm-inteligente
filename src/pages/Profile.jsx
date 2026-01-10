@@ -128,7 +128,7 @@ export default function Profile() {
           <Separator className="bg-border" />
 
           {/* Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label className="text-muted-foreground flex items-center gap-2">
                 <Mail className="w-4 h-4" />
@@ -165,17 +165,7 @@ export default function Profile() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-muted-foreground flex items-center gap-2">
-                <User className="w-4 h-4" />
-                ID do Usuário
-              </Label>
-              <Input
-                value={user?.id || ''}
-                disabled
-                className="bg-background border-border text-foreground font-mono text-xs"
-              />
-            </div>
+
           </div>
         </CardContent>
       </Card>

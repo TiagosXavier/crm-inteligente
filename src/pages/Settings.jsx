@@ -108,29 +108,65 @@ export default function Settings() {
   });
 
   const createAIMutation = useMutation({
-    mutationFn: (data) => base44.entities.AIConfig.create(data),
+    mutationFn: (data) => {
+      if (!isAdmin) {
+        throw new Error('Apenas administradores podem criar configurações de IA');
+      }
+      return base44.entities.AIConfig.create(data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['aiConfigs'] });
       toast({ title: 'Configuração de IA criada!' });
       closeAIForm();
     },
+    onError: (error) => {
+      toast({ 
+        title: 'Erro ao criar configuração', 
+        description: error.message,
+        variant: 'destructive' 
+      });
+    },
   });
 
   const updateAIMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.AIConfig.update(id, data),
+    mutationFn: ({ id, data }) => {
+      if (!isAdmin) {
+        throw new Error('Apenas administradores podem editar configurações de IA');
+      }
+      return base44.entities.AIConfig.update(id, data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['aiConfigs'] });
       toast({ title: 'Configuração de IA atualizada!' });
       closeAIForm();
     },
+    onError: (error) => {
+      toast({ 
+        title: 'Erro ao atualizar configuração', 
+        description: error.message,
+        variant: 'destructive' 
+      });
+    },
   });
 
   const deleteAIMutation = useMutation({
-    mutationFn: (id) => base44.entities.AIConfig.delete(id),
+    mutationFn: (id) => {
+      if (!isAdmin) {
+        throw new Error('Apenas administradores podem excluir configurações de IA');
+      }
+      return base44.entities.AIConfig.delete(id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['aiConfigs'] });
       toast({ title: 'Configuração de IA excluída!' });
       setDeleteAIConfig(null);
+    },
+    onError: (error) => {
+      toast({ 
+        title: 'Erro ao excluir configuração', 
+        description: error.message,
+        variant: 'destructive' 
+      });
     },
   });
 
