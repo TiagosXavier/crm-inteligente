@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { cn } from '@/lib/utils';
 import {
@@ -19,7 +21,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
-  { name: 'Conversas', icon: MessageSquare, page: 'Conversations', badge: 5 },
+  { name: 'Conversas', icon: MessageSquare, page: 'Conversations', showBadge: true },
   { name: 'Contatos', icon: Users, page: 'Contacts' },
   { name: 'Pipeline', icon: Kanban, page: 'Pipeline' },
   { name: 'Templates', icon: FileText, page: 'Templates', roles: ['admin', 'supervisor'] },
@@ -28,6 +30,13 @@ const menuItems = [
 ];
 
 export default function Sidebar({ collapsed, setCollapsed, currentPage, userRole }) {
+  const { data: contacts = [] } = useQuery({
+    queryKey: ['contacts'],
+    queryFn: () => base44.entities.Contact.list(),
+  });
+
+  const unreadCount = contacts.filter(c => c.status === 'novo' || c.status === 'em_atendimento').length;
+
   const filteredItems = menuItems.filter(item => {
     if (!item.roles) return true;
     return item.roles.includes(userRole);
@@ -80,16 +89,16 @@ export default function Sidebar({ collapsed, setCollapsed, currentPage, userRole
                 {!collapsed && (
                   <>
                     <span className="font-medium">{item.name}</span>
-                    {item.badge && (
+                    {item.showBadge && unreadCount > 0 && (
                       <span className="ml-auto bg-rose-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                        {item.badge}
+                        {unreadCount}
                       </span>
                     )}
                   </>
                 )}
-                {collapsed && item.badge && (
+                {collapsed && item.showBadge && unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                    {item.badge}
+                    {unreadCount}
                   </span>
                 )}
               </Link>
