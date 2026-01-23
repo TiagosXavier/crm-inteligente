@@ -1,6 +1,6 @@
-import base44 from "@base44/vite-plugin"
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import path from "path"
 
 export default defineConfig(({ command }) => {
   // Use root path for Vercel, GitHub Pages path for gh-pages deploy
@@ -10,10 +10,20 @@ export default defineConfig(({ command }) => {
   return {
     base,
     plugins: [
-      base44({
-        legacySDKImports: process.env.BASE44_LEGACY_SDK_IMPORTS === 'true'
-      }),
       react(),
     ],
+    resolve: {
+      alias: {
+        "@": path.resolve(path.dirname(new URL(import.meta.url).pathname), "./src"),
+      },
+    },
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+        },
+      },
+    },
   };
 });
