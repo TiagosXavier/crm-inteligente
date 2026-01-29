@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { cn } from '@/lib/utils';
@@ -32,7 +32,7 @@ const menuItems = [
 export default function Sidebar({ collapsed, setCollapsed, currentPage, userRole }) {
   const { data: contacts = [] } = useQuery({
     queryKey: ['contacts'],
-    queryFn: () => base44.entities.Contact.list(),
+    queryFn: () => api.entities.Contact.list(),
   });
 
   const unreadCount = contacts.filter(c => c.status === 'novo' || c.status === 'em_atendimento').length;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/client';
 import { useTheme } from '@/components/ui/ThemeProvider';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -44,7 +44,7 @@ export default function Header({ user, collapsed }) {
   const handleStatusChange = async (newStatus) => {
     setIsUpdating(true);
     try {
-      await base44.auth.updateMe({ status: newStatus });
+      await api.auth.updateMe({ status: newStatus });
       setStatus(newStatus);
     } catch (error) {
       // Status update failed silently
@@ -54,7 +54,7 @@ export default function Header({ user, collapsed }) {
   };
 
   const handleLogout = () => {
-    base44.auth.logout();
+    api.auth.logout();
   };
 
   const getInitials = (name) => {

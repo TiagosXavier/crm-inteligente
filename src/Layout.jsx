@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/client';
 import { useQuery } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import Sidebar from '@/components/layout/Sidebar';
@@ -13,7 +13,7 @@ export default function Layout({ children, currentPageName }) {
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => api.auth.me(),
   });
 
   useEffect(() => {

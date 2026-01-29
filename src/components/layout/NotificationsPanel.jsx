@@ -1,5 +1,5 @@
 import React from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -33,12 +33,16 @@ export default function NotificationsPanel({ userEmail }) {
 
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications', userEmail],
-    queryFn: () => base44.entities.Notification.filter({ user_email: userEmail }, '-created_date', 50),
+    queryFn: async () => {
+      const all = await api.entities.Notification.list('-created_date');
+      // Filter by user_email client-side
+      return all.filter(n => n.user_email === userEmail).slice(0, 50);
+    },
     enabled: !!userEmail,
   });
 
   const markAsReadMutation = useMutation({
-    mutationFn: (id) => base44.entities.Notification.update(id, { read: true }),
+    mutationFn: (id) => api.entities.Notification.update(id, { read: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
@@ -48,7 +52,7 @@ export default function NotificationsPanel({ userEmail }) {
     mutationFn: async () => {
       const unreadNotifications = notifications.filter(n => !n.read);
       await Promise.all(unreadNotifications.map(n => 
-        base44.entities.Notification.update(n.id, { read: true })
+        api.entities.Notification.update(n.id, { read: true })
       ));
     },
     onSuccess: () => {
@@ -57,7 +61,7 @@ export default function NotificationsPanel({ userEmail }) {
   });
 
   const deleteNotificationMutation = useMutation({
-    mutationFn: (id) => base44.entities.Notification.delete(id),
+    mutationFn: (id) => api.entities.Notification.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },

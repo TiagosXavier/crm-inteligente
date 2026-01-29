@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,23 +34,21 @@ export default function InviteUserDialog({ open, onOpenChange }) {
 
   const inviteMutation = useMutation({
     mutationFn: async (data) => {
-      // Use the correct Base44 API to invite user
-      await base44.users.inviteUser(data.email, data.role);
-      
-      // Create notification for the new user
-      await base44.entities.Notification.create({
-        title: 'Bem-vindo ao CRM Smart!',
-        message: `Você foi convidado para a equipe como ${getRoleLabel(data.role)}`,
-        type: 'success',
-        user_email: data.email,
+      // Cria o usuário diretamente no backend
+      const newUser = await api.entities.User.create({
+        email: data.email,
+        full_name: data.full_name,
+        role: data.role,
+        status: 'pending',
+        is_active: true,
       });
 
-      return data;
+      return newUser;
     },
-    onSuccess: () => {
+    onSuccess: (user) => {
       toast({
-        title: 'Convite enviado!',
-        description: 'O usuário receberá um email com instruções.',
+        title: 'Usuário criado!',
+        description: `${user.full_name} foi adicionado à equipe.`,
       });
       queryClient.invalidateQueries({ queryKey: ['users'] });
       resetForm();
@@ -58,21 +56,12 @@ export default function InviteUserDialog({ open, onOpenChange }) {
     },
     onError: (error) => {
       toast({
-        title: 'Erro ao enviar convite',
+        title: 'Erro ao criar usuário',
         description: error.message || 'Tente novamente mais tarde.',
         variant: 'destructive',
       });
     },
   });
-
-  const getRoleLabel = (role) => {
-    const labels = {
-      admin: 'Administrador',
-      supervisor: 'Supervisor',
-      user: 'Atendente',
-    };
-    return labels[role] || role;
-  };
 
   const resetForm = () => {
     setFormData({
@@ -101,10 +90,10 @@ export default function InviteUserDialog({ open, onOpenChange }) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="w-5 h-5 text-primary" />
-            Convidar Novo Usuário
+            Adicionar Novo Usuário
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Envie um convite por email para adicionar um novo membro à equipe.
+            Adicione um novo membro à equipe.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -174,12 +163,12 @@ export default function InviteUserDialog({ open, onOpenChange }) {
               {inviteMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Enviando...
+                  Criando...
                 </>
               ) : (
                 <>
                   <Mail className="w-4 h-4 mr-2" />
-                  Enviar Convite
+                  Adicionar Usuário
                 </>
               )}
             </Button>
