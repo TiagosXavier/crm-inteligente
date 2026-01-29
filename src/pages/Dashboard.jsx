@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/client';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,17 +78,17 @@ export default function Dashboard() {
 
   const { data: contacts = [], isLoading: contactsLoading } = useQuery({
     queryKey: ['contacts'],
-    queryFn: () => base44.entities.Contact.list('-created_date', 100),
+    queryFn: () => api.entities.Contact.list('-created_date', 100),
   });
 
   const { data: users = [], isLoading: usersLoading } = useQuery({
     queryKey: ['users'],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => api.entities.User.list(),
   });
 
   const { data: templates = [], isLoading: templatesLoading } = useQuery({
     queryKey: ['templates'],
-    queryFn: () => base44.entities.Template.list(),
+    queryFn: () => api.entities.Template.list(),
   });
 
   const applyFilters = () => {

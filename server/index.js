@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -18,6 +18,17 @@ app.use(express.json());
 const DB_DIR = join(__dirname, 'db');
 const DB_FILE = join(DB_DIR, 'database.json');
 
+// Initial database structure
+const INITIAL_DB = {
+  contacts: [],
+  conversations: [],
+  tasks: [],
+  users: [],
+  templates: [],
+  aiconfigs: [],
+  notifications: [],
+};
+
 // Ensure database directory and file exist
 async function initDatabase() {
   try {
@@ -26,15 +37,7 @@ async function initDatabase() {
     try {
       await fs.access(DB_FILE);
     } catch {
-      // Create initial database structure
-      const initialData = {
-        contacts: [],
-        conversations: [],
-        tasks: [],
-        users: [],
-        templates: []
-      };
-      await fs.writeFile(DB_FILE, JSON.stringify(initialData, null, 2));
+      await fs.writeFile(DB_FILE, JSON.stringify(INITIAL_DB, null, 2));
       console.log('📦 Database initialized');
     }
   } catch (error) {
@@ -49,7 +52,7 @@ async function readDB() {
     return JSON.parse(data);
   } catch (error) {
     console.error('Error reading database:', error);
-    return { contacts: [], conversations: [], tasks: [], users: [], templates: [] };
+    return { ...INITIAL_DB };
   }
 }
 
@@ -68,263 +71,242 @@ function generateId() {
   return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
+// Parse sort parameter
+function parseSort(sortParam) {
+  if (!sortParam) return { field: 'created_date', direction: 'desc' };
+  const direction = sortParam.startsWith('-') ? 'desc' : 'asc';
+  const field = sortParam.startsWith('-') ? sortParam.slice(1) : sortParam;
+  return { field, direction };
+}
+
+// Sort array
+function sortArray(array, sortParam) {
+  const { field, direction } = parseSort(sortParam);
+  return [...array].sort((a, b) => {
+    const aVal = a[field];
+    const bVal = b[field];
+    if (direction === 'desc') {
+      return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+    }
+    return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+  });
+}
+
+// Generic CRUD factory
+function createCRUDRoutes(entityName, collectionName) {
+  const router = express.Router();
+
+  // List
+  router.get('/', async (req, res) => {
+    try {
+      const db = await readDB();
+      const { sort, limit, ...filters } = req.query;
+
+      let items = db[collectionName] || [];
+
+      // Apply filters
+      Object.entries(filters).forEach(([key, value]) => {
+        items = items.filter((item) => item[key] == value);
+      });
+
+      // Sort
+      items = sortArray(items, sort);
+
+      // Limit
+      if (limit) {
+        items = items.slice(0, parseInt(limit, 10));
+      }
+
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get by ID
+  router.get('/:id', async (req, res) => {
+    try {
+      const db = await readDB();
+      const item = (db[collectionName] || []).find((i) => i.id === req.params.id);
+
+      if (!item) {
+        return res.status(404).json({ error: `${entityName} not found` });
+      }
+
+      res.json(item);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create
+  router.post('/', async (req, res) => {
+    try {
+      const db = await readDB();
+      if (!db[collectionName]) db[collectionName] = [];
+
+      const now = new Date().toISOString();
+      const newItem = {
+        id: generateId(),
+        ...req.body,
+        created_date: now,
+        updated_date: now,
+      };
+
+      db[collectionName].push(newItem);
+      await writeDB(db);
+
+      res.status(201).json(newItem);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Update
+  router.put('/:id', async (req, res) => {
+    try {
+      const db = await readDB();
+      if (!db[collectionName]) db[collectionName] = [];
+
+      const index = db[collectionName].findIndex((i) => i.id === req.params.id);
+
+      if (index === -1) {
+        return res.status(404).json({ error: `${entityName} not found` });
+      }
+
+      db[collectionName][index] = {
+        ...db[collectionName][index],
+        ...req.body,
+        updated_date: new Date().toISOString(),
+      };
+
+      await writeDB(db);
+      res.json(db[collectionName][index]);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Delete
+  router.delete('/:id', async (req, res) => {
+    try {
+      const db = await readDB();
+      if (!db[collectionName]) db[collectionName] = [];
+
+      const index = db[collectionName].findIndex((i) => i.id === req.params.id);
+
+      if (index === -1) {
+        return res.status(404).json({ error: `${entityName} not found` });
+      }
+
+      const deleted = db[collectionName].splice(index, 1)[0];
+      await writeDB(db);
+
+      res.json(deleted);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  return router;
+}
+
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date() });
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // ============================================================================
-// CONTACTS ROUTES
+// AUTH ROUTES (simplificado para desenvolvimento)
 // ============================================================================
 
-// List contacts
-app.get('/api/contacts', async (req, res) => {
-  try {
+app.get('/api/auth/me', async (req, res) => {
+  // Em desenvolvimento, retorna usuário mock
+  // Em produção, verificar token JWT
+  const authHeader = req.headers.authorization;
+
+  if (authHeader) {
+    // Simula verificação de token
     const db = await readDB();
-    const { sort = '-created_date' } = req.query;
-
-    let contacts = [...db.contacts];
-
-    // Simple sort
-    if (sort) {
-      const [direction, field] = sort.startsWith('-')
-        ? ['desc', sort.slice(1)]
-        : ['asc', sort];
-
-      contacts.sort((a, b) => {
-        const aVal = a[field];
-        const bVal = b[field];
-        if (direction === 'desc') {
-          return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
-        }
-        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-      });
-    }
-
-    res.json(contacts);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Get contact by ID
-app.get('/api/contacts/:id', async (req, res) => {
-  try {
-    const db = await readDB();
-    const contact = db.contacts.find(c => c.id === req.params.id);
-
-    if (!contact) {
-      return res.status(404).json({ error: 'Contact not found' });
-    }
-
-    res.json(contact);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Create contact
-app.post('/api/contacts', async (req, res) => {
-  try {
-    const db = await readDB();
-    const now = new Date().toISOString();
-
-    const newContact = {
-      id: generateId(),
-      ...req.body,
-      created_date: now,
-      updated_date: now,
+    const user = db.users?.[0] || {
+      id: 'dev-user-1',
+      email: 'dev@example.com',
+      full_name: 'Usuário Dev',
+      role: 'admin',
+      status: 'online',
     };
-
-    db.contacts.push(newContact);
-    await writeDB(db);
-
-    res.status(201).json(newContact);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.json(user);
+  } else {
+    res.status(401).json({ error: 'Not authenticated' });
   }
 });
 
-// Update contact
-app.put('/api/contacts/:id', async (req, res) => {
+app.put('/api/auth/me', async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
   try {
     const db = await readDB();
-    const index = db.contacts.findIndex(c => c.id === req.params.id);
-
-    if (index === -1) {
-      return res.status(404).json({ error: 'Contact not found' });
+    // Find the first user (simplified - in production, decode JWT)
+    if (db.users && db.users.length > 0) {
+      db.users[0] = {
+        ...db.users[0],
+        ...req.body,
+        updated_date: new Date().toISOString(),
+      };
+      await writeDB(db);
+      res.json(db.users[0]);
+    } else {
+      res.status(404).json({ error: 'User not found' });
     }
-
-    db.contacts[index] = {
-      ...db.contacts[index],
-      ...req.body,
-      updated_date: new Date().toISOString(),
-    };
-
-    await writeDB(db);
-    res.json(db.contacts[index]);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Delete contact
-app.delete('/api/contacts/:id', async (req, res) => {
-  try {
-    const db = await readDB();
-    const index = db.contacts.findIndex(c => c.id === req.params.id);
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body;
 
-    if (index === -1) {
-      return res.status(404).json({ error: 'Contact not found' });
-    }
+  // Em desenvolvimento, aceita qualquer login
+  // Em produção, verificar credenciais no banco
+  const db = await readDB();
+  let user = db.users?.find((u) => u.email === email);
 
-    const deleted = db.contacts.splice(index, 1)[0];
-    await writeDB(db);
-
-    res.json(deleted);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ============================================================================
-// CONVERSATIONS ROUTES
-// ============================================================================
-
-app.get('/api/conversations', async (req, res) => {
-  try {
-    const db = await readDB();
-    res.json(db.conversations);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post('/api/conversations', async (req, res) => {
-  try {
-    const db = await readDB();
-    const newConversation = {
+  if (!user) {
+    // Cria usuário se não existir (modo dev)
+    user = {
       id: generateId(),
-      ...req.body,
+      email,
+      full_name: email.split('@')[0],
+      role: 'admin',
+      status: 'online',
       created_date: new Date().toISOString(),
     };
-    db.conversations.push(newConversation);
+    if (!db.users) db.users = [];
+    db.users.push(user);
     await writeDB(db);
-    res.status(201).json(newConversation);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
+
+  // Gera token simples (em produção, usar JWT)
+  const token = Buffer.from(`${user.id}:${Date.now()}`).toString('base64');
+
+  res.json({ user, token });
 });
 
 // ============================================================================
-// TASKS ROUTES
+// ENTITY ROUTES
 // ============================================================================
 
-app.get('/api/tasks', async (req, res) => {
-  try {
-    const db = await readDB();
-    res.json(db.tasks);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post('/api/tasks', async (req, res) => {
-  try {
-    const db = await readDB();
-    const newTask = {
-      id: generateId(),
-      ...req.body,
-      created_date: new Date().toISOString(),
-    };
-    db.tasks.push(newTask);
-    await writeDB(db);
-    res.status(201).json(newTask);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put('/api/tasks/:id', async (req, res) => {
-  try {
-    const db = await readDB();
-    const index = db.tasks.findIndex(t => t.id === req.params.id);
-
-    if (index === -1) {
-      return res.status(404).json({ error: 'Task not found' });
-    }
-
-    db.tasks[index] = {
-      ...db.tasks[index],
-      ...req.body,
-      updated_date: new Date().toISOString(),
-    };
-
-    await writeDB(db);
-    res.json(db.tasks[index]);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete('/api/tasks/:id', async (req, res) => {
-  try {
-    const db = await readDB();
-    const index = db.tasks.findIndex(t => t.id === req.params.id);
-
-    if (index === -1) {
-      return res.status(404).json({ error: 'Task not found' });
-    }
-
-    const deleted = db.tasks.splice(index, 1)[0];
-    await writeDB(db);
-    res.json(deleted);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ============================================================================
-// USERS ROUTES
-// ============================================================================
-
-app.get('/api/users', async (req, res) => {
-  try {
-    const db = await readDB();
-    res.json(db.users);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ============================================================================
-// TEMPLATES ROUTES
-// ============================================================================
-
-app.get('/api/templates', async (req, res) => {
-  try {
-    const db = await readDB();
-    res.json(db.templates);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post('/api/templates', async (req, res) => {
-  try {
-    const db = await readDB();
-    const newTemplate = {
-      id: generateId(),
-      ...req.body,
-      created_date: new Date().toISOString(),
-    };
-    db.templates.push(newTemplate);
-    await writeDB(db);
-    res.status(201).json(newTemplate);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+app.use('/api/contacts', createCRUDRoutes('Contact', 'contacts'));
+app.use('/api/conversations', createCRUDRoutes('Conversation', 'conversations'));
+app.use('/api/tasks', createCRUDRoutes('Task', 'tasks'));
+app.use('/api/users', createCRUDRoutes('User', 'users'));
+app.use('/api/templates', createCRUDRoutes('Template', 'templates'));
+app.use('/api/aiconfigs', createCRUDRoutes('AIConfig', 'aiconfigs'));
+app.use('/api/notifications', createCRUDRoutes('Notification', 'notifications'));
 
 // ============================================================================
 // SEED ROUTE - Initialize with mock data
@@ -334,40 +316,37 @@ app.post('/api/seed', async (req, res) => {
   try {
     const db = await readDB();
 
-    // Only seed if database is empty
-    if (db.contacts.length > 0) {
-      return res.json({ message: 'Database already has data', count: db.contacts.length });
-    }
+    // Seed each collection if provided
+    const collections = ['contacts', 'conversations', 'tasks', 'users', 'templates', 'aiconfigs', 'notifications'];
 
-    // Use the mock data from request body or generate it
-    if (req.body.contacts) {
-      db.contacts = req.body.contacts;
-    }
-    if (req.body.conversations) {
-      db.conversations = req.body.conversations;
-    }
-    if (req.body.tasks) {
-      db.tasks = req.body.tasks;
-    }
-    if (req.body.users) {
-      db.users = req.body.users;
-    }
-    if (req.body.templates) {
-      db.templates = req.body.templates;
+    for (const collection of collections) {
+      if (req.body[collection] && Array.isArray(req.body[collection])) {
+        // Only seed if collection is empty
+        if (!db[collection] || db[collection].length === 0) {
+          db[collection] = req.body[collection];
+        }
+      }
     }
 
     await writeDB(db);
 
     res.json({
       message: 'Database seeded successfully',
-      counts: {
-        contacts: db.contacts.length,
-        conversations: db.conversations.length,
-        tasks: db.tasks.length,
-        users: db.users.length,
-        templates: db.templates.length,
-      }
+      counts: Object.fromEntries(collections.map((c) => [c, (db[c] || []).length])),
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================================
+// RESET ROUTE - Clear database (development only)
+// ============================================================================
+
+app.post('/api/reset', async (req, res) => {
+  try {
+    await writeDB({ ...INITIAL_DB });
+    res.json({ message: 'Database reset successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

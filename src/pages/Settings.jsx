@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -91,16 +91,16 @@ export default function Settings() {
 
   const { data: currentUser, isLoading: userLoading } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => api.auth.me(),
   });
 
   const { data: aiConfigs = [], isLoading: aiLoading } = useQuery({
     queryKey: ['aiConfigs'],
-    queryFn: () => base44.entities.AIConfig.list('-created_date'),
+    queryFn: () => api.entities.AIConfig.list('-created_date'),
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data) => base44.auth.updateMe(data),
+    mutationFn: (data) => api.auth.updateMe(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
       toast({ title: 'Perfil atualizado com sucesso!' });
@@ -112,7 +112,7 @@ export default function Settings() {
       if (!isAdmin) {
         throw new Error('Apenas administradores podem criar configurações de IA');
       }
-      return base44.entities.AIConfig.create(data);
+      return api.entities.AIConfig.create(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['aiConfigs'] });
@@ -133,7 +133,7 @@ export default function Settings() {
       if (!isAdmin) {
         throw new Error('Apenas administradores podem editar configurações de IA');
       }
-      return base44.entities.AIConfig.update(id, data);
+      return api.entities.AIConfig.update(id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['aiConfigs'] });
@@ -154,7 +154,7 @@ export default function Settings() {
       if (!isAdmin) {
         throw new Error('Apenas administradores podem excluir configurações de IA');
       }
-      return base44.entities.AIConfig.delete(id);
+      return api.entities.AIConfig.delete(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['aiConfigs'] });

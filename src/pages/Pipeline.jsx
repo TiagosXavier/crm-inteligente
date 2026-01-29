@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,16 +59,16 @@ export default function Pipeline() {
 
   const { data: contacts = [], isLoading } = useQuery({
     queryKey: ['contacts'],
-    queryFn: () => base44.entities.Contact.list('-created_date'),
+    queryFn: () => api.entities.Contact.list('-created_date'),
   });
 
   const { data: users = [] } = useQuery({
     queryKey: ['users'],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => api.entities.User.list(),
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Contact.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.Contact.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
     },
