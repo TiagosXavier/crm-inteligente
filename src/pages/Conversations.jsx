@@ -62,21 +62,44 @@ export default function Conversations() {
   const [deletedContacts, setDeletedContacts] = useState({}); // New state for deleted contacts
   const [showNewMessageDialog, setShowNewMessageDialog] = useState(false); // State to control new message dialog
   const [showContactsSearch, setShowContactsSearch] = useState(false); // State to control visibility of contacts search
+  const [contactUnreadData, setContactUnreadData] = useState({});
 
   const { data: contacts = [], isLoading } = useQuery({
     queryKey: ['contacts'],
     queryFn: () => api.entities.Contact.list('-created_date'),
   });
 
+  useEffect(() => {
+    if (contacts.length > 0) {
+      setContactUnreadData(prevData => {
+        const newData = { ...prevData };
+        let madeChanges = false;
+        contacts.forEach(contact => {
+          if (!newData[contact.id]) {
+            newData[contact.id] = {
+              isUnreadInitially: Math.random() > 0.7,
+              unreadCount: Math.floor(Math.random() * 5) + 1,
+            };
+            madeChanges = true;
+          }
+        });
+        return madeChanges ? newData : prevData;
+      });
+    }
+  }, [contacts]);
+
   // Simulate unread count and starred status
   const processedContacts = contacts
     .filter(contact => !deletedContacts[contact.id]) // Filter out deleted contacts
-    .map(contact => ({
-      ...contact,
-      isUnread: !readContacts[contact.id] && (Math.random() > 0.7), // 30% chance to be unread if not marked as read
-      unreadCount: Math.floor(Math.random() * 5) + 1,
-      isStarred: !!starredContacts[contact.id],
-    }));
+    .map(contact => {
+      const unreadData = contactUnreadData[contact.id] || { isUnreadInitially: false, unreadCount: 0 };
+      return {
+        ...contact,
+        isUnread: !readContacts[contact.id] && unreadData.isUnreadInitially,
+        unreadCount: unreadData.unreadCount,
+        isStarred: !!starredContacts[contact.id],
+      }
+    });
 
   // Check for contactId in URL params and auto-select contact
   useEffect(() => {
