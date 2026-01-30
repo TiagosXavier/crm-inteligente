@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '@/api/client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,10 +21,18 @@ import {
   Circle,
   CheckCheck,
   Clock,
-  Tag
+  Tag,
+  Star
 } from 'lucide-react';
 import { format, isToday, isYesterday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import ConversationFilterBar from '@/components/conversations/ConversationFilterBar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Mock messages for demo
 const mockMessages = [
@@ -39,29 +47,66 @@ export default function Conversations() {
   const [search, setSearch] = useState('');
   const [selectedContact, setSelectedContact] = useState(null);
   const [message, setMessage] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [starredContacts, setStarredContacts] = useState({}); // New state for starred contacts
 
   const { data: contacts = [], isLoading } = useQuery({
     queryKey: ['contacts'],
     queryFn: () => api.entities.Contact.list('-created_date'),
   });
 
+  // Simulate unread count and starred status
+  const processedContacts = contacts.map(contact => ({
+    ...contact,
+    isUnread: Math.random() > 0.7, // 30% chance to be unread
+    unreadCount: Math.floor(Math.random() * 5) + 1, // Random unread count between 1 and 5
+    isStarred: !!starredContacts[contact.id], // Check if contact is starred
+  }));
+
   // Check for contactId in URL params and auto-select contact
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const contactId = urlParams.get('contactId');
     
-    if (contactId && contacts.length > 0) {
-      const contact = contacts.find(c => c.id === contactId);
+    if (contactId && processedContacts.length > 0) {
+      const contact = processedContacts.find(c => c.id === contactId);
       if (contact) {
         setSelectedContact(contact);
       }
     }
-  }, [contacts]);
+  }, [processedContacts]);
 
-  const filteredContacts = contacts.filter((contact) =>
-    contact.name?.toLowerCase().includes(search.toLowerCase()) ||
-    contact.phone?.includes(search)
-  );
+  const filteredContacts = useMemo(() => {
+    let contactsToFilter = processedContacts;
+
+    // Apply search filter
+    if (search) {
+      contactsToFilter = contactsToFilter.filter((contact) =>
+        contact.name?.toLowerCase().includes(search.toLowerCase()) ||
+        contact.phone?.includes(search)
+      );
+    }
+
+    // Apply active filter
+    switch (activeFilter) {
+      case 'unread':
+        contactsToFilter = contactsToFilter.filter(contact => contact.isUnread);
+        break;
+      case 'starred':
+        contactsToFilter = contactsToFilter.filter(contact => contact.isStarred);
+        break;
+      case 'recents':
+        // Contacts are already sorted by -created_date from API. No additional sorting needed here.
+        // If the API call changes, this would need to be re-evaluated.
+        break;
+      case 'all':
+      default:
+        // No specific filter, just search applied
+        break;
+    }
+    
+    return contactsToFilter;
+  }, [processedContacts, search, activeFilter]);
 
   const getInitials = (name) => {
     if (!name) return '?';
@@ -94,10 +139,20 @@ export default function Conversations() {
     setMessage('');
   };
 
+  const handleToggleStar = (contactId) => {
+    setStarredContacts(prevStarred => ({
+      ...prevStarred,
+      [contactId]: !prevStarred[contactId],
+    }));
+  };
+
   return (
     <div className="flex gap-4" style={{ height: 'calc(100vh - 120px)' }}>
       {/* Contacts List */}
       <Card className="bg-card border-border w-96 flex-shrink-0 flex flex-col overflow-hidden">
+        {/* Filter bar */}
+        <ConversationFilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+
         <div className="p-4 border-b border-border flex-shrink-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -155,10 +210,13 @@ export default function Conversations() {
                     </div>
                     <p className="text-sm text-muted-foreground truncate">Última mensagem do contato...</p>
                   </div>
-                  {Math.random() > 0.5 && (
+                  {contact.isUnread && (
                     <span className="w-5 h-5 bg-primary rounded-full flex items-center justify-center text-xs text-primary-foreground font-bold">
-                      {Math.floor(Math.random() * 5) + 1}
+                      {contact.unreadCount}
                     </span>
+                  )}
+                  {contact.isStarred && (
+                    <Star className="w-4 h-4 text-amber-400" />
                   )}
                 </div>
               ))}
@@ -186,9 +244,18 @@ export default function Conversations() {
                 </div>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-              <MoreVertical className="w-5 h-5" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                  <MoreVertical className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleToggleStar(selectedContact.id)}>
+                  {selectedContact.isStarred ? 'Desfavoritar' : 'Favoritar'}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Messages */}
