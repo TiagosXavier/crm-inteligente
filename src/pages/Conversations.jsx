@@ -22,7 +22,9 @@ import {
   CheckCheck,
   Clock,
   Tag,
-  Star
+  Star,
+  MailOpen,
+  Trash2
 } from 'lucide-react';
 import { format, isToday, isYesterday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -48,7 +50,9 @@ export default function Conversations() {
   const [selectedContact, setSelectedContact] = useState(null);
   const [message, setMessage] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
-  const [starredContacts, setStarredContacts] = useState({}); // New state for starred contacts
+  const [starredContacts, setStarredContacts] = useState({});
+  const [readContacts, setReadContacts] = useState({}); // New state for read contacts
+  const [deletedContacts, setDeletedContacts] = useState({}); // New state for deleted contacts
 
   const { data: contacts = [], isLoading } = useQuery({
     queryKey: ['contacts'],
@@ -56,12 +60,14 @@ export default function Conversations() {
   });
 
   // Simulate unread count and starred status
-  const processedContacts = contacts.map(contact => ({
-    ...contact,
-    isUnread: Math.random() > 0.7, // 30% chance to be unread
-    unreadCount: Math.floor(Math.random() * 5) + 1, // Random unread count between 1 and 5
-    isStarred: !!starredContacts[contact.id], // Check if contact is starred
-  }));
+  const processedContacts = contacts
+    .filter(contact => !deletedContacts[contact.id]) // Filter out deleted contacts
+    .map(contact => ({
+      ...contact,
+      isUnread: !readContacts[contact.id] && (Math.random() > 0.7), // 30% chance to be unread if not marked as read
+      unreadCount: Math.floor(Math.random() * 5) + 1,
+      isStarred: !!starredContacts[contact.id],
+    }));
 
   // Check for contactId in URL params and auto-select contact
   useEffect(() => {
@@ -144,6 +150,29 @@ export default function Conversations() {
       ...prevStarred,
       [contactId]: !prevStarred[contactId],
     }));
+  };
+
+  const handleMarkAsRead = (contactId) => {
+    setReadContacts(prevRead => ({
+      ...prevRead,
+      [contactId]: true,
+    }));
+    // After marking as read, if the current filter is 'unread', the contact might disappear
+    // Optionally, you might want to switch to 'all' filter or deselect the contact.
+    // For now, it will simply update the status.
+  };
+
+  const handleDeleteConversation = (contactId) => {
+    // In a real app, this would call an API to delete the conversation.
+    // For simulation, we add it to a list of deleted contacts.
+    setDeletedContacts(prevDeleted => ({
+      ...prevDeleted,
+      [contactId]: true,
+    }));
+    // Deselect contact if the deleted contact is currently selected
+    if (selectedContact?.id === contactId) {
+      setSelectedContact(null);
+    }
   };
 
   return (
@@ -252,7 +281,16 @@ export default function Conversations() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => handleToggleStar(selectedContact.id)}>
+                  <Star className="mr-2 h-4 w-4" />
                   {selectedContact.isStarred ? 'Desfavoritar' : 'Favoritar'}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleMarkAsRead(selectedContact.id)}>
+                  <MailOpen className="mr-2 h-4 w-4" />
+                  Marcar como lida
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDeleteConversation(selectedContact.id)} className="text-rose-500">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Deletar conversa
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
