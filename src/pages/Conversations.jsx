@@ -24,7 +24,8 @@ import {
   Tag,
   Star,
   MailOpen,
-  Trash2
+  Trash2,
+  Plus
 } from 'lucide-react';
 import { format, isToday, isYesterday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -35,6 +36,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Mock messages for demo
 const mockMessages = [
@@ -53,6 +60,8 @@ export default function Conversations() {
   const [starredContacts, setStarredContacts] = useState({});
   const [readContacts, setReadContacts] = useState({}); // New state for read contacts
   const [deletedContacts, setDeletedContacts] = useState({}); // New state for deleted contacts
+  const [showNewMessageDialog, setShowNewMessageDialog] = useState(false); // State to control new message dialog
+  const [showContactsSearch, setShowContactsSearch] = useState(false); // State to control visibility of contacts search
 
   const { data: contacts = [], isLoading } = useQuery({
     queryKey: ['contacts'],
@@ -255,109 +264,137 @@ export default function Conversations() {
       </Card>
 
       {/* Chat Area */}
-      {selectedContact ? (
-        <Card className="bg-card border-border flex-1 flex flex-col">
-          {/* Chat Header */}
-          <div className="p-4 border-b border-border flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar className="w-10 h-10">
-                <AvatarFallback className="bg-primary text-primary-foreground">
-                  {getInitials(selectedContact.name)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="font-semibold text-foreground">{selectedContact.name}</h2>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Circle className={`w-2 h-2 ${getStatusColor(selectedContact.status)}`} />
-                  <span>Online</span>
-                </div>
-              </div>
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-                  <MoreVertical className="w-5 h-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleToggleStar(selectedContact.id)}>
-                  <Star className="mr-2 h-4 w-4" />
-                  {selectedContact.isStarred ? 'Desfavoritar' : 'Favoritar'}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleMarkAsRead(selectedContact.id)}>
-                  <MailOpen className="mr-2 h-4 w-4" />
-                  Marcar como lida
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleDeleteConversation(selectedContact.id)} className="text-rose-500">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Deletar conversa
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          {/* Messages */}
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              <div className="text-center">
-                <span className="text-xs text-muted-foreground bg-accent px-3 py-1 rounded-full">
-                  Hoje
-                </span>
-              </div>
-              
-              {mockMessages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.fromUser ? 'justify-start' : 'justify-end'}`}
-                >
-                  <div
-                    className={`max-w-[70%] p-3 rounded-2xl ${
-                      msg.fromUser
-                        ? 'bg-accent text-foreground rounded-bl-none'
-                        : 'bg-primary text-primary-foreground rounded-br-none'
-                    }`}
-                  >
-                    <p className="text-sm">{msg.content}</p>
-                    <div className={`flex items-center justify-end gap-1 mt-1 ${msg.fromUser ? 'text-muted-foreground' : 'text-primary-foreground/70'}`}>
-                      <span className="text-xs">{msg.time}</span>
-                      {!msg.fromUser && <CheckCheck className="w-3 h-3" />}
-                    </div>
+      <TooltipProvider>
+        {selectedContact ? (
+          <Card className="bg-card border-border flex-1 flex flex-col">
+            {/* Chat Header */}
+            <div className="p-4 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Avatar className="w-10 h-10">
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    {getInitials(selectedContact.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h2 className="font-semibold text-foreground">{selectedContact.name}</h2>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Circle className={`w-2 h-2 ${getStatusColor(selectedContact.status)}`} />
+                    <span>Online</span>
                   </div>
                 </div>
-              ))}
+              </div>
+              <div className="flex gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleToggleStar(selectedContact.id)}
+                      className={`text-muted-foreground hover:text-foreground ${selectedContact.isStarred ? 'text-amber-400' : ''}`}
+                    >
+                      <Star className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{selectedContact.isStarred ? 'Desfavoritar' : 'Favoritar'}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleMarkAsRead(selectedContact.id)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <MailOpen className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Marcar como lida</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteConversation(selectedContact.id)}
+                      className="text-rose-500 hover:text-rose-600"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Deletar conversa</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </div>
-          </ScrollArea>
 
-          {/* Input Area */}
-          <form onSubmit={handleSendMessage} className="p-4 border-t border-border">
-            <div className="flex items-center gap-2">
-              <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-                <Paperclip className="w-5 h-5" />
-              </Button>
-              <Input
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Digite sua mensagem..."
-                className="flex-1 bg-background border-border"
-              />
-              <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-                <Smile className="w-5 h-5" />
-              </Button>
-              <Button type="submit" size="icon" className="bg-primary hover:bg-primary/90">
-                <Send className="w-4 h-4" />
-              </Button>
+            {/* Messages */}
+            <ScrollArea className="flex-1 p-4">
+              <div className="space-y-4">
+                <div className="text-center">
+                  <span className="text-xs text-muted-foreground bg-accent px-3 py-1 rounded-full">
+                    Hoje
+                  </span>
+                </div>
+                
+                {mockMessages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.fromUser ? 'justify-start' : 'justify-end'}`}
+                  >
+                    <div
+                      className={`max-w-[70%] p-3 rounded-2xl ${
+                        msg.fromUser
+                          ? 'bg-accent text-foreground rounded-bl-none'
+                          : 'bg-primary text-primary-foreground rounded-br-none'
+                      }`}
+                    >
+                      <p className="text-sm">{msg.content}</p>
+                      <div className={`flex items-center justify-end gap-1 mt-1 ${msg.fromUser ? 'text-muted-foreground' : 'text-primary-foreground/70'}`}>
+                        <span className="text-xs">{msg.time}</span>
+                        {!msg.fromUser && <CheckCheck className="w-3 h-3" />}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+
+            {/* Input Area */}
+            <form onSubmit={handleSendMessage} className="p-4 border-t border-border">
+              <div className="flex items-center gap-2">
+                <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                  <Paperclip className="w-5 h-5" />
+                </Button>
+                <Input
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Digite sua mensagem..."
+                  className="flex-1 bg-background border-border"
+                />
+                <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                  <Smile className="w-5 h-5" />
+                </Button>
+                <Button type="submit" size="icon" className="bg-primary hover:bg-primary/90">
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </form>
+          </Card>
+        ) : (
+          <Card className="bg-card border-border flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <MessageSquare className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <h2 className="text-xl font-semibold text-foreground mb-2">Selecione uma conversa</h2>
+              <p className="text-muted-foreground">Escolha um contato para iniciar o atendimento</p>
             </div>
-          </form>
-        </Card>
-      ) : (
-        <Card className="bg-card border-border flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <MessageSquare className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">Selecione uma conversa</h2>
-            <p className="text-muted-foreground">Escolha um contato para iniciar o atendimento</p>
-          </div>
-        </Card>
-      )}
+          </Card>
+        )}
+      </TooltipProvider>
 
       {/* Contact Details Sidebar */}
       {selectedContact && (
