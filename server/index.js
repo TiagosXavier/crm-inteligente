@@ -67,7 +67,7 @@ app.use('/api', globalLimiter);
 // JWT AUTH MIDDLEWARE
 // ============================================================================
 
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const IS_PRODUCTION = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 
 // Cookie options para httpOnly
 const COOKIE_OPTIONS = {

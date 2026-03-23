@@ -1,9 +1,9 @@
 // API Client - Substitui completamente o Base44 SDK
 // Usa o backend Node.js próprio
 
-// In production (Vercel), use relative URL since API is on same domain
-// In dev, use localhost:3000
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3000/api');
+// In production (Vercel), always use relative /api since API is on same domain
+// In dev, use VITE_API_URL or fallback to localhost:3000
+const API_URL = import.meta.env.PROD ? '/api' : (import.meta.env.VITE_API_URL || 'http://localhost:3000/api');
 
 // Helper para fazer requisições — usa cookies httpOnly (credentials: include)
 async function request(endpoint, options = {}) {
