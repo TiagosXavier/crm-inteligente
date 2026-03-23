@@ -196,6 +196,11 @@ function validateBody(collectionName) {
   };
 }
 
+// Database file path (JSON file for simplicity)
+// On Vercel serverless, use /tmp (writable but ephemeral)
+const DB_DIR = process.env.VERCEL === '1' ? '/tmp/db' : join(__dirname, 'db');
+const DB_FILE = join(DB_DIR, 'database.json');
+
 // ============================================================================
 // AUDIT LOG — registra ações de escrita
 // ============================================================================
@@ -267,11 +272,6 @@ function auditMiddleware(req, res, next) {
 }
 
 app.use('/api', auditMiddleware);
-
-// Database file path (JSON file for simplicity)
-// On Vercel serverless, use /tmp (writable but ephemeral)
-const DB_DIR = process.env.VERCEL === '1' ? '/tmp/db' : join(__dirname, 'db');
-const DB_FILE = join(DB_DIR, 'database.json');
 
 // Initial database structure
 const INITIAL_DB = {
