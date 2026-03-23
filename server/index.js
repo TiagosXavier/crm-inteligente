@@ -300,8 +300,18 @@ async function initDatabase() {
   }
 }
 
+// Ensure DB is initialized (lazy, runs once)
+let _dbInitPromise = null;
+async function ensureDB() {
+  if (!_dbInitPromise) {
+    _dbInitPromise = initDatabase();
+  }
+  await _dbInitPromise;
+}
+
 // Read database
 async function readDB() {
+  await ensureDB();
   try {
     const data = await fs.readFile(DB_FILE, 'utf8');
     return JSON.parse(data);
@@ -313,6 +323,7 @@ async function readDB() {
 
 // Write database
 async function writeDB(data) {
+  await ensureDB();
   try {
     await fs.writeFile(DB_FILE, JSON.stringify(data, null, 2));
   } catch (error) {
@@ -702,8 +713,7 @@ if (process.env.VERCEL !== '1') {
     });
   });
 } else {
-  // Vercel serverless — init DB synchronously on first request
-  initDatabase();
+  // Vercel serverless — DB init is handled lazily via ensureDB()
 }
 
 export default app;
