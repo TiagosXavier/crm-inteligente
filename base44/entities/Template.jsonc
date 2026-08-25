@@ -1,0 +1,39 @@
+{
+  "name": "Template",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nome do template"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "saudacao",
+        "despedida",
+        "informacoes",
+        "suporte",
+        "vendas"
+      ],
+      "description": "Categoria do template"
+    },
+    "content": {
+      "type": "string",
+      "description": "Conte\u00fado do template"
+    },
+    "shortcut": {
+      "type": "string",
+      "description": "Atalho para uso r\u00e1pido"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se o template est\u00e1 ativo"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "content"
+  ]
+}

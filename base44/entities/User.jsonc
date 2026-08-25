@@ -1,0 +1,33 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "online",
+        "away",
+        "offline"
+      ],
+      "default": "offline",
+      "description": "Status do agente"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "URL do avatar"
+    },
+    "max_simultaneous": {
+      "type": "number",
+      "default": 5,
+      "description": "M\u00e1ximo de atendimentos simult\u00e2neos"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se o agente est\u00e1 ativo"
+    }
+  },
+  "required": [
+    "avatar_url"
+  ]
+}

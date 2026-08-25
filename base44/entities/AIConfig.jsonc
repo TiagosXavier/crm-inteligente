@@ -1,0 +1,47 @@
+{
+  "name": "AIConfig",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nome da configura\u00e7\u00e3o"
+    },
+    "provider": {
+      "type": "string",
+      "enum": [
+        "openai",
+        "anthropic",
+        "google"
+      ],
+      "description": "Provedor de IA"
+    },
+    "model": {
+      "type": "string",
+      "description": "Modelo a ser usado"
+    },
+    "system_prompt": {
+      "type": "string",
+      "description": "Prompt de sistema"
+    },
+    "temperature": {
+      "type": "number",
+      "default": 0.7,
+      "description": "Temperatura do modelo"
+    },
+    "max_tokens": {
+      "type": "number",
+      "default": 1000,
+      "description": "M\u00e1ximo de tokens na resposta"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se a configura\u00e7\u00e3o est\u00e1 ativa"
+    }
+  },
+  "required": [
+    "name",
+    "provider",
+    "model"
+  ]
+}
